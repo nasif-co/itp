@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Intro to Physical Computing • Nasif's ITP Blog</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/p5.min.js" defer></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/addons/p5.dom.min.js"></script> -->
+    <!-- <script type="text/javascript" src="https://rawgit.com/patriciogonzalezvivo/glslCanvas/master/dist/GlslCanvas.js"></script> -->
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Recursive:wght,CRSV,MONO@300..1000,0,0..1&family=Noto+Color+Emoji&display=block" rel="stylesheet"> 
+    <meta name="description" content="Nasif's experience at the ITP Intro to Physical Computing course.">
+    <meta name=”robots” content=”index, follow”>
+    <link rel="icon" type="image/png" href="../../favicon.png">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+</head>    
+<body>
+    <main class="page-container course-container">
+        <hgroup>
+            <p class="course-meta">Fall 2024 • Daniel Rozin</p>
+            <h1 class="project-title">Physical Computing</h1>
+        </hgroup>
+        <div class="text-content">
+            <h2 class="project-subtitle">Week 01</h2>
+            <p>This first week was a refresher on the basic knowledge of electronics, through the development of some short practical labs and technical texts.</p>
+            <div class="image-slide">
+                <figure>
+                    <img src="https://assets.nasif.co/variable-supply.webp" alt="Variable power supply reads 6.8V, 0.02A. The leads are connected to a multimeter in voltage reading mode. It reads 9.0V.">
+                    <figcaption>I measured the variable supply before connecting it to the arduino. Was a bit surprised that the measurement on the multimeter was so different from the supply.</figcaption>
+                </figure>
+                <figure>
+                    <img src="https://assets.nasif.co/power-arduino.webp" alt="Arduino Nano IoT 33 on the edge of a breadboard. Connected with red and blue cables to a variable power supply that reads 6.8V.">
+                    <figcaption>With the measured voltage, I connected the arduino through the VIN pin. Built-in LED flashed with the "blink" sketch, indicating it was running.</figcaption>
+                </figure>
+                <figure>
+                    <img src="https://assets.nasif.co/measure-arduino.webp" alt="Arduino Nano IoT 33 on the edge of a breadboard. Hands use a multimeter to measure two points on the breadboard, connected to vcc and ground. It reads 4.43V">
+                    <figcaption>The board's VCC was measured as 4.43V, a bit high considering it is supposed to be 3.3V. Since I had never worked with a variable supply before, they might be something I'm overlooking.</figcaption>
+                </figure>
+            </div>
+            <p>Apart from those labs, I also measured the output voltage from an LM7805 when supplied power from the variable supply. The reading was once again very strange, which corroborated my suspicions that I must be misunderstanding something about the variable supply. I decided to switch to a standard supply for the next lab.</p>
+            <div class="image-slide">
+                <figure>
+                    <video src="https://assets.nasif.co/fade-out-led.webm" controls></video>
+                    <figcaption>I wired my blue LED as the provided diagram but decided to add a 4700μF capacitor in parallel with the LED. I thought this would cause it to both fade in and out, but it only faded out. I realized then that the fade in would be more complicated in these analog circuits, without PWM.</figcaption>
+                </figure>
+            </div>
+            <p>This fade out reminded me of Maywa Denki's machines, some of which have lights that power on instantly with the beats of his music, and then fade away. I decided then to make my switch music-related.</p>
+            <p>The idea was to make a simple switch that turns on the light to the rhythm of your feet tapping, an action usually done semi-subconsciously when you connect with the music.</p>
+            <div class="image-slide">
+                <figure>
+                    <img src="https://assets.nasif.co/switch-1.webp" alt="A copper plate with a wire on top of it, connected with a small strip of copper tape.">
+                    <figcaption>The first layer of my soft switch sandwich.</figcaption>
+                </figure>
+                <figure>
+                    <img src="https://assets.nasif.co/switch-2.webp" alt="The foam piece of a headphone set on top of the copper plate.">
+                    <figcaption>I used the foam of a headphone set as the dielectric for my soft switch.</figcaption>
+                </figure>
+                <figure>
+                    <img src="https://assets.nasif.co/switch-3.webp" alt="Copper plate with a wire connected with copper tape. All on top of the foam piece.">
+                    <figcaption>Next I added another layer of copper.</figcaption>
+                </figure>
+                <figure>
+                    <img src="https://assets.nasif.co/switch-4.webp" alt="Soft switch built with two copper plates and a headphone piece foam in between.">
+                    <figcaption>A little gaffer tape to hold it together.</figcaption>
+                </figure>
+            </div>
+            <p>After testing it out, I noticed it was very hard to create a connection when tapping, so I iterated:</p>
+            <div class="image-slide">
+                <figure>
+                    <img src="https://assets.nasif.co/switch-iteration.webp" alt="Soft switch built with two copper plates and a headphone piece foam in between. It is opened up, showing a crumpled up piece of copper inside the middle hole of the foam piece.">
+                    <figcaption>To fix that issue and make it more easy to close the circuit, I added a crumpled piece of copper inside.</figcaption>
+                </figure>
+            </div>
+            <p>Then the final switch was ready:</p>
+            <div class="image-slide">
+                <figure>
+                    <video src="https://assets.nasif.co/foot-switch-led.webm" controls></video>
+                </figure>
+            </div>
+            <p>It could definitely benefit from a debounce algorithm on the switch press detection, but I was satisfied with the result considering it was an analog circuit :).</p>
+        </div>
+    </main>
+    <script src="../../js/pixelBG.js"></script>
+</body>
+</html>
