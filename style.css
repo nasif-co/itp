@@ -391,6 +391,10 @@ a[href]:not([href=""])[download]{
     /* font-style: italic; */
 }
 
+.text-content figure figcaption strong {
+    font-weight: 700;
+}
+
 @media screen and (max-width: 992px) {
     .project-subtitle {
         --fsz: 20;
@@ -460,5 +464,18 @@ a[href]:not([href=""])[download]{
     .text-content figure:only-child img,
     .text-content figure:only-child video {
         max-width: 78vw;
+    }
+}
+
+.audio-gallery {
+    display: grid;
+    grid-template-columns: auto auto;
+    column-gap: 30px;
+    justify-content: start;
+}
+
+@media screen and (max-width: 730px) {
+    .audio-gallery {
+        display: block;
     }
 }
