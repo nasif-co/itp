@@ -24,6 +24,103 @@
         </hgroup>
         <div class="text-content">
             <div class="blog-week">
+                <h2 class="project-subtitle">Week 03</h2>
+                <p>This week's work was focused on analog signals, specifically working with some audio and motors. Since I have experience working with motors, but very little with audio, I decided to focus more on that.</p>
+                <p><strong>I was intrigued by the <a href="https://sensorium.github.io/Mozzi/" target="_blank" rel="noopener noreferrer">Mozzi</a> sound synthesis library</strong> mentioned in the lab readings. At first I really couldn't believe something like that existed without the need of a shield or an extra breakout board. So I decided to try it out.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/mozzi-wiring.webp" alt="A breadboard with an arduino nano 33 iot, a potentiometer, a pnp transistor and an 8ohm speaker.">
+                        <figcaption>I did a basic circuit running a speaker with 5V through a PNP transistor. I placed a potentiometer in series with the speaker to do some basic volume control. The output of the arduino that controlled the transistor was pin A0, which is the pin that the Mozzi library uses for this type of arduino.</figcaption>
+                    </figure>
+                </div>
+                <p>Once I had tested that out with a simple tone, I went ahead and uploaded an example from the library.</p>
+                <div class="image-slide">
+                    <figure>
+                        <video controls loading="lazy" src="https://assets.nasif.co/example-mozzi.webm" alt="A breadboard running a speaker, synthesizing a vibrato sound."></video>
+                        <figcaption>I tested out the example Vibrato sketch.</figcaption>
+                    </figure>
+                </div>
+                <p>I then started moving the code around and making some changes, trying to understand how it all works. Since I don't have much experience with sound, some large concepts were not very clear to me. I spent a good time reading and fiddling with the <a href="https://sensorium.github.io/Mozzi/learn/" target="_blank" rel="noopener noreferrer">Mozzi online learning guides</a>.</p>
+                <div class="image-slide">
+                    <figure>
+                        <video controls loading="lazy" src="https://assets.nasif.co/ramp-up.webm" alt="A breadboard running a speaker, ramping up the pitch."></video>
+                        <figcaption>Making some changes, I figured out how I could change values as the sketch looped, using the <code>updateControls()</code> function. This sketch just continually increase the pitch each iteration of the loop.</figcaption>
+                    </figure>
+                </div>
+                <p>After understanding how to modify value in real time, I ventured to add a sensor for control:</p>
+                <div class="image-slide">
+                    <figure>
+                        <video controls loading="lazy" src="https://assets.nasif.co/fsr-pitch.webm" alt="A breadboard running a speaker, with a force-resistive sensor that changes the pitch of the output sound."></video>
+                        <figcaption>I added an FSR that controlled the frequency of an oscillator, which also had a vibrato active.</figcaption>
+                    </figure>
+                </div>
+                <p>At this point, I started spending more time on the code side, trying to understand how to layer multiple oscillators or what could be done to create more interesting outputs that have more depth. I think a deeper knowledge of how sound synthesis works would be a lot of help. In the end I decided to make one more interactive sketch:</p>
+                <div class="image-slide">
+                    <figure>
+                        <video controls loading="lazy" src="https://assets.nasif.co/multi-oscillator.webm" alt="A breadboard running a speaker, with two potentiometers that change pitch and vibrato respectively."></video>
+                        <figcaption>Sketch with 4 different oscillators, each with vibrato. Both their frequencies and the depth of vibrato are controlled by potentiometers.</figcaption>
+                    </figure>
+                </div>
+                <details>
+                    <summary>Show/hide code below</summary>
+                    <pre><code class="language-c++">
+#define MOZZI_CONTROL_RATE 128
+#include &lt;Mozzi.h&gt;
+#include &lt;Oscil.h&gt;
+#include &lt;tables/sin2048_int8.h&gt;
+
+//Oscillator for first frequency
+Oscil &lt;2048, MOZZI_AUDIO_RATE&gt; aSin(SIN2048_DATA);
+
+//Oscillator for second frequency
+Oscil &lt;2048, MOZZI_AUDIO_RATE&gt; aSin2(SIN2048_DATA);
+
+//Oscillator for third frequency
+Oscil &lt;2048, MOZZI_AUDIO_RATE&gt; aSin3(SIN2048_DATA);
+
+//Oscillator for fourth frequency
+Oscil &lt;2048, MOZZI_AUDIO_RATE&gt; aSin4(SIN2048_DATA);
+
+//Oscillator for vibrato
+Oscil &lt;2048, MOZZI_CONTROL_RATE&gt; kVib(SIN2048_DATA);
+
+int freq = 900;
+float vibrato = 0;
+int combinedOutput = freq;
+
+void setup() {
+    startMozzi();
+    aSin.setFreq(400);
+    aSin2.setFreq(400);
+    aSin3.setFreq(400);
+    aSin4.setFreq(400);
+    kVib.setFreq(6.5f);
+}
+
+void updateControl() {
+    int trimmerL = mozziAnalogRead&lt;10&gt;(2);
+    int trimmerR = mozziAnalogRead&lt;10&gt;(3);
+
+    vibrato = map(constrain(trimmerR, 0 , 1024), 0, 1024, 2, 60) * kVib.next();
+    freq = map(constrain(trimmerL, 0 , 1024), 0, 1024, 300, 10000);
+    aSin.setFreq(freq + vibrato / 2);
+    aSin2.setFreq(freq + 100 + vibrato);
+    aSin3.setFreq(freq + 200 + vibrato);
+    aSin4.setFreq(freq + 300 + vibrato);
+}
+
+AudioOutput updateAudio() {
+    combinedOutput = aSin.next() + aSin2.next() + aSin3.next() + aSin4.next(); // Mix the audio signals
+    return MonoOutput::from8Bit((combinedOutput / 4)); // Normalize output
+}
+
+void loop() {
+    audioHook();
+}                        
+                    </code></pre>
+                    </details>
+            </div>
+            <div class="blog-week">
                 <h2 class="project-subtitle">Week 02</h2>
                 <p>This week we delved into inputs and outputs as well as serial communication. During class, Prof. Rozin recommended that students with previous knowledge in pcomp work beyond the labs to continue their learning.</p>
                 <p>Therefore, I decided to develop a small project based on the USB capabilities of the nano to simulate a mouse and keyboard. I wanted to create a grid-like interface to control the mouse, setting the x & y of the mouse with sliders. This would allow me to practice using analog sensors and learn more of the mouse functions.</p>
