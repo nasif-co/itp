@@ -24,6 +24,38 @@
         </hgroup>
         <div class="text-content">
             <div class="blog-week">
+                <h2 class="project-subtitle">Week 04</h2>
+                <p>This week was mainly focused on finding a concept for the midterm, apart from the course readings. After looking into the midterm project description, I found the idea of doing <strong>a research project</strong> the most appealing, exploring technologies I have not worked with before for a future (possibly final project) piece.</p>
+                <p>For a long time, I have been interested in directional speakers: sound transducers that project sound in a narrow beam, so only those in the trajectory of said beam can hear it. Normally, these speakers, like the ones from <a href="https://www.focusonics.com/" target="_blank" rel="noopener noreferrer">Focusonics</a> or <a href="https://www.indiegogo.com/projects/sray-world-s-smallest-directional-speaker#/" target="_blank" rel="noopener noreferrer">SRAY</a> are very expensive.</p>
+                <p>However, recently I have come across a low-cost way to build these speakers:</p>
+                <figure>
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/aBdVfUnS-pM?si=X2cMJItEUhlm8jxk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    <figcaption>Short video on how to build a directional speaker that works with ultrasonic transducers.</figcaption>
+                </figure>
+                <p>I have worked with these transducers on their own somewhat before, making kind of like an ultrasonic radio, to send private messages over-the-air and sense them through haptics. In retrospect it was very ill-considered. It was an exploration on haptic commmunication, but the directionality of ultrasound did not really help: the two devices had to be pointed directly at each other. The mount design and material were not ideal either.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/communicators-side-by-sdie.webp" alt="Two identical rectangular ceramic objects with protruding electronics, both on a white plinth over a black background.">
+                        <figcaption>Photo from 04/28/19. The two communicators were encased in a ceramic wearable. Users could send tactile presses by tapping the FSR. The other user would receive those presses real time and sense them haptically, with the small cell-shaped vibration motor.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/ceramic-communicator.webp" alt="A small white ceramic object mounted on the upper portion of a man's arm, with two protruding ultrasonic transducers.">
+                        <figcaption>Photo from 04/27/19. The way the arm-mounted wearable was conceptualized.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/communicator-circuit.webp" alt="Arduino and other electronics on a breadboard.">
+                        <figcaption>Photo from 04/27/19. The electronics inside.</figcaption>
+                    </figure>
+                </div>
+                <p>So I would really enjoy revisiting this directionality of ultrasound through a new lens, which is why <strong>I am looking to focus my midterm on building and researching directional "spotlight" speakers</strong>.</p>
+                <p>A longer term goal is to implement these speakers in an automated system, that can actually point and project audio at specific people around it. To do this, I would also like to explore <a href="https://www.sparkfun.com/products/10335" target="_blank" rel="noopener noreferrer">Servo Pan/Tilt Brackets</a> and <a href="https://en.wikipedia.org/wiki/Linear_actuator" target="_blank" rel="noopener noreferrer">stepper motor traveling nut linear actuators</a>, as potential ways to control my system.</p>
+                <p>Some art pieces that explore/exploit these phenomenons:</p>
+                <ul>
+                    <li><a href="https://www.youtube.com/watch?v=M1RWxQaM5mc" target="_blank" rel="noopener noreferrer">Phillipe Parreno's "Anywhen"</a></li>
+                    <li><a href="https://vimeo.com/375740284" target="_blank" rel="noopener noreferrer">Jónsi, "Svartalda (Dark wave)"</a></li>
+                </ul>
+            </div>
+            <div class="blog-week">
                 <h2 class="project-subtitle">Week 03</h2>
                 <p>This week's work was focused on analog signals, specifically working with some audio and motors. Since I have experience working with motors, but very little with audio, I decided to focus more on that.</p>
                 <p><strong>I was intrigued by the <a href="https://sensorium.github.io/Mozzi/" target="_blank" rel="noopener noreferrer">Mozzi</a> sound synthesis library</strong> mentioned in the lab readings. At first I really couldn't believe something like that existed without the need of a shield or an extra breakout board. So I decided to try it out.</p>
