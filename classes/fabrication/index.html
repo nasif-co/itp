@@ -24,6 +24,133 @@
         </hgroup>
         <div class="text-content">
             <div class="blog-week">
+                <h2 class="project-subtitle">Week 04</h2>
+                <p>This fourth week was dedicated to enclosures, using the techniques we have learnt plus possibly the router. I decided I wanted to make a flashlight, which was ambicious in hindsight, given the limited time.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/lamp-sketch.webp" alt="Sketch of a flashlight.">
+                        <figcaption>The design I made for it was a simple dowel as a handle and a larger cone-shaped piece for the light to project out of. From the base of the handle pops out a small dowel with a sphere, which can be pulled/pushed to dim the flashlight.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/lamp-measurements.webp" alt="Section view sketch of a flashlight.">
+                        <figcaption>I made some measurements (which would later change) based on the way I would structure the inside. The idea was to have the interior lined with plastic tubing. The piston would pass through a plug that fits tightly into the tube. It then keeps going and grabs hold of the bottom of an upside down slider. The wiper on the slider is held in place as it is mounted on the tubing lining.</figcaption>
+                    </figure>
+                </div>
+                <p>After planning out the logistics with the help of Phil, I went on with getting the parts to be enclosed.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/flashlight-breakdown.webp" alt="Flashlight pieces on a cutting mat.">
+                        <figcaption>I bought a cheap flashlight and tore it apart into its constituents.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/flashlight-circuit.webp" alt="Front view of a small circuit board.">
+                        <figcaption>I analyzed the circuit to understand how it worked, since the flashlight had 5 different modes. It basically consisted of the LED and an IC that controlled those modes. As I couldn't find a datasheet for the IC, I assumed it was a custom solution for this product. So I then decided to desolder the ic and the button, and leave only the LED and battery terminals.</figcaption>
+                    </figure>
+                    <figure>
+                        <video controls loading="lazy" src="https://assets.nasif.co/dim-flashlight.webm" alt="A breadboard with a potentiometer dimming an LED."></video>
+                        <figcaption>I built a simple circuit using a mosfet to control the dimming of the flashlight. The beauty of it is that the mosftet takes negligible current to control, so when the resistance of the potentiometer is very high, basically no current is being used, saving battery power.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/flashlight-mod.webp" alt="Makeshift circuit with a transistor.">
+                        <figcaption>I then soldered the circuit trying to keep the smallest footprint possible.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/circuit-terminals.webp" alt="Small electronic terminals.">
+                        <figcaption>I decided to use these terminals for the connection to the potentiometer, since I wanted it to be easy to disconnect if the need arises, so that this piece can fully come out of the flashlight.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/slider-mount-test.webp" alt="Slider potentiometer pushed into the wall of a plastic tube.">
+                        <figcaption>Small test trying out the idea of holding the potentiometer from the taper by pushing it into a small cut on the side of the tube.</figcaption>
+                    </figure>
+                </div>
+                <p>I then moved onto one of the big challenges of this build: hollowing out the handle.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/dowel-exploded.webp" alt="Dowel broken into pieces.">
+                        <figcaption>This is the first test I did cutting into the cyling with a spade bit (since it was the longest one). After this one, I managed to cut into one of this small test cylindes.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/dowel-jig-1.webp" alt="Piece of wood with a large circle drilled out of it.">
+                        <figcaption>I made a jig that would accomodate the dowel.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/dowel-drill-test-2.webp" alt="Long dowel being held by vise.">
+                        <figcaption>Holding the dowel on the jig with the vise.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/dowel-drill-test-3.webp" alt="Wooden dowel with a tear in the middle.">
+                        <figcaption>Another failed test, still using the spade bit with a bit extender. At this point I realized that the bit extender was really imprecise and very tricky to get it to go deep in a perfectly straight line.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/dowel-jig-2.webp" alt="A block of wood with a hole in the center, cut lengthwise to expose both sides of the hole.">
+                        <figcaption>I made a new larger jig that could give more stability.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/dowel-jig-friction.webp" alt="Dowel with a glove finger on the bottom.">
+                        <figcaption>Kai instructed me to use a glove to add even more friction and keep the wood steady in the jig.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/long-spade-bit.webp" alt="Long spade bit mounted on the bench press over a dowel clamped down lengthwise.">
+                        <figcaption>I also decided to buy a long spade bit, as I believed it would be more stable than the bit extender.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/dowel-drill-test-5.webp" alt="Dowel with a lengthwise hole and a crack down the side with a tear at the bottom.">
+                        <figcaption>Although deeper, this new test also broke the wall of the dowel, which meant it was still going in at a slight angle that would eventually eat up on the walls.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/pilot-hole.webp" alt="A dowel with a small and shallow center hole drilled lengthwise on the base.">
+                        <figcaption>I made a pilot hole on the base and used it to place the clamped dowel as center as I could with the spade bit, trying to get as close as possible to a perfectly straight cut.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/dowel-success.webp" alt="A wooden dowel with a long hole lengthwise.">
+                        <figcaption>Finally this worked. It still went in at an angle because, when looking in, one of the walls at the bottom lets in more light than the others.</figcaption>
+                    </figure>
+                </div>
+                <p>Once the first challenge was overcome, after spending two days on it, I started working on the cone for the projector.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/cone-initial.webp" alt="Small block of wood.">
+                        <figcaption>Started by cutting and squaring out a block of wood as best I could, in the dimensions of the projector.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/decagonal-prism-saw.webp" alt="Wooden decagonal prism on the band saw.">
+                        <figcaption>I printed a decagon the size I wanted and taped it to the piece, which I used as a guide cutting it out on the band saw.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/decagonal-prism-sanded.webp" alt="Wooden decagonal prism on the belt sander.">
+                        <figcaption>I then sanded it down, taking care to maintain the faces that I wanted for the final piece.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/fit-test.webp" alt="Wooden dowel inserted into a wooden decagonal prism.">
+                        <figcaption>I also made all the holes from my diagrams and tested out the fit with the handle. Initially I wanted to do a dovetail joint but I scrapped that for the time being.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/carving-demo.webp" alt="Hands carving a piece of wood.">
+                        <figcaption>Since I wanted this piece to taper down, my friend Niko lent me his wood carving tools and taught me how to achieve this. This way I could maintain the faces instead of rounding it out.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/intial-step-down.webp" alt="A conic decagonal prism.">
+                        <figcaption>I printed another decagon, smaller, to use as a guide on the side that was to be smaller. I then carved it down to that size, but I still wanted it closer to the handle size, so I printed a new decagon and kept going.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/final-step-down.webp" alt="A conic decagonal prism with a wooden dowel coming out of it.">
+                        <figcaption>The piece after carving it down to the desired size.</figcaption>
+                    </figure>
+                </div>
+                <p>Once this part was done, I sanded it all down to 400 grit to give it a better finish.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/sanded-flashlight-chassis.webp" alt="A conic decagonal prism with a wooden dowel coming out of it.">
+                        <figcaption>The sanded down enclosure.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/sanded-flashlight-chassis-2.webp" alt="A conic decagonal prism with a wooden dowel coming out of it.">
+                        <figcaption>The sanded down enclosure.</figcaption>
+                    </figure>
+                </div>
+                <p>Unfortunately the week was over by this point, so I will have to continue past the deadline.</p>
+            </div>
+            <div class="blog-week">
                 <h2 class="project-subtitle">Week 03</h2>
                 <p>For the third week we had to work with the laser cutter, making the same piece in two different scales, and using some sort of joinery.</p>
                 <p>I really struggled with this assignment since I very much dislike the way laser cut wood smells and looks, and sanding does not really help if you need the precision of the laser cuts, which is its main appeal. After wasting a lot of time thinking around this, I settled with making a more decorative than useful piece: fridge magnets.</p>
