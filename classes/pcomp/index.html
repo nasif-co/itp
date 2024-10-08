@@ -24,6 +24,74 @@
         </hgroup>
         <div class="text-content">
             <div class="blog-week">
+                <h2 class="project-subtitle">Week 05</h2>
+                <h2 style="margin-top: 1em" class="project-subtitle">Midterm</h2>
+                <p>This week I continued researching about parametric speakers, trying to best understand their limitations and their possibilites. I started testing them out with the one Noah lent me:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/japanese-speaker.webp" alt="Array of ultrasound transducers.">
+                        <figcaption>A parametric speaker that Noah lent me for a few days, it really helped to understand some of the basic aspects of these speakers.</figcaption>
+                    </figure>
+                    <figure>
+                        <video controls loading="lazy" src="https://assets.nasif.co/parametric-speaker-test.mp4" alt="Man points speaker at the camera and then points it away."></video>
+                        <figcaption>Test of directionality with the speaker.</figcaption>
+                    </figure>  
+                </div>
+                <p>I also studied the technical aspects of this technology and drew a few important conclusions:</p>
+                <ul>
+                    <li>They seem to work best from a distance, so <strong>mounting them from an unreachable place is best</strong>. Ceiling mount might be the ideal location.</li>
+                    <li>These speakers (with the circuits I have found) <strong>cannot transmit very high or very low frequencies</strong> (about 400Hz to 5KHz), which is very important to take into account when deciding the sounds to be played. Maybe they could be accompanied with a non-directional bass, so only the melody is projected directionally.</li>
+                    <li>The <strong>ideal frequency to modulate the ultrasound at is 60KHz</strong>, however the only affordable transducers I could find are 40KHz ones. It seems that the main industrial manufacturers like <a href="https://www.holosonics.com/" target="_blank" rel="noopener noreferrer">Holosonics</a> use 60KHz.</li>
+                    <li>More transducers per array translate to more directionality (a more closed angle).</li>
+                    <li>They are <strong>very reflective</strong>, it might be a good idea to use them in a sound-isolated space than can absorb the waves.</li>
+                    <li>There are some worries about the safety of this technology. The general consensus is that ultrasound applications <strong>should not exceed 110-115dB SPL</strong> (sound pressure levels) to remain safe. This is orders or magnitude above what these hand built transducers can do, but it is good to keep in mind.</li>
+                </ul>
+                <p>A lot of this information came from a <a href="http://tristate.ne.jp/parame.htm" target="_blank" rel="noopener noreferrer">translated version of the speaker's documentation</a>, <a href="http://zao.jp/radio/parametric/index_e.php" target="_blank" rel="noopener noreferrer">other japanese documentation</a>, <a href="https://www.youtube.com/watch?v=aBdVfUnS-pM" target="_blank" rel="noopener noreferrer">the first comment on an instructables video</a>, and the <a href="https://en.wikipedia.org/wiki/Sound_from_ultrasound#cite_note-ReferenceA-1" target="_blank" rel="noopener noreferrer">Wikipedia article about generating sound from Ultrasound</a>.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/param-circuit-diagram.webp" alt="Circuit diagram.">
+                        <figcaption>This is the circuit diagram I will use to build my first prototype. It was taken from the video I cited last week, and is the simplest option I have found, which is a good starting point.</figcaption>
+                    </figure>
+                </div>
+                <p>I prepared a BOM and ordered the required components from DigiKey:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/bom-midterm-pcomp.webp" alt="Bill of materials.">
+                        <figcaption>Bill of materials for the prototype, minus the components I have access to at the floor.</figcaption>
+                    </figure>
+                </div>
+                <p>Next steps will be building the prototype and meeting with some faculty to go over some of the technical questions I have.</p>
+                <h2 class="project-subtitle" style="margin-top: 1em;">Labs</h2>
+                <p>This week's labs focused on controlling high loads using transistors and relays. This is something I have worked on before, but I can never seem to memorize what each leg of the mosfet does. So I decided to review it by making a simple analog circuit.</p>
+                <p>For my intro to fabrication, I wanted to make a flashlight that was dimmable, so I bought a premade flashlight and modified its circuit using a mosfet:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/flashlight-breakdown.webp" alt="Flashlight pieces on a cutting mat.">
+                        <figcaption>I bought a cheap flashlight and tore it apart into its constituents.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/original-circuit.webp" alt="Small flashlight pcb.">
+                        <figcaption>I analyzed the circuit to understand how it worked, since the flashlight had 5 different modes. It basically consisted of the LED and an IC that controlled those modes. Sadly I couldn't find a datasheet or any documentation, which made me think it was a custom proprietary chip.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/flashlight-circuit.webp" alt="Front view of a small circuit board.">
+                        <figcaption>I desoldered the button and the IC, as well as the secondary LED to leave just the flashlight LED and the battery holder.</figcaption>
+                    </figure>
+                    <figure>
+                        <video controls loading="lazy" src="https://assets.nasif.co/dim-flashlight.webm" alt="A breadboard with a potentiometer dimming an LED."></video>
+                        <figcaption>I then built a simple circuit using a mosfet to control the dimming of the flashlight. The beauty of it is that the mosftet takes negligible current to control, so when the resistance of the potentiometer is very high, basically no current is being used, saving battery power.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/flashlight-mod.webp" alt="Makeshift circuit with a transistor.">
+                        <figcaption>I then soldered the circuit trying to keep the smallest footprint possible.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/circuit-terminals.webp" alt="Small electronic terminals.">
+                        <figcaption>I decided to use these terminals for the connection to the potentiometer, since I wanted it to be easy to disconnect if the need arises, so that this piece can fully come out of the flashlight.</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="blog-week">
                 <h2 class="project-subtitle">Week 04</h2>
                 <p>This week was mainly focused on finding a concept for the midterm, apart from the course readings. After looking into the midterm project description, I found the idea of doing <strong>a research project</strong> the most appealing, exploring technologies I have not worked with before for a future (possibly final project) piece.</p>
                 <p>For a long time, I have been interested in directional speakers: sound transducers that project sound in a narrow beam, so only those in the trajectory of said beam can hear it. Normally, these speakers, like the ones from <a href="https://www.focusonics.com/" target="_blank" rel="noopener noreferrer">Focusonics</a> or <a href="https://www.indiegogo.com/projects/sray-world-s-smallest-directional-speaker#/" target="_blank" rel="noopener noreferrer">SRAY</a> are very expensive.</p>
