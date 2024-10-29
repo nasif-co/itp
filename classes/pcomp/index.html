@@ -24,6 +24,534 @@
         </hgroup>
         <div class="text-content">
             <div class="blog-week">
+                <h2 class="project-subtitle">Week 06, 07 & 08</h2>
+                <h2 style="margin-top: 1em" class="project-subtitle">Midterm & P5 Serial Lab</h2>
+                <p>These weeks were mainly focused on working on the midterm, for which I did the arduino to p5 serial communication lab.</p>
+                <p>Before continuing with my project, I met with Jeff to discuss the technical questions I outlined in my previous post. Although we couldn't arrive at some definitive answers, he did show me how to use an oscilloscope to measure the frequency of the wave going to the ultrasound array, something that I must always maintain at 40kHz.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/oscilloscope.webp" alt="An oscilloscope reading a wave with a 40kHz frequency.">
+                        <figcaption>I tested it out with Noah's speaker and measured 40.32kHz.</figcaption>
+                    </figure>
+                </div>
+                <p>The day after, my components arrived. Sadly, I had mistaken the amount of transducers in the order, as I thought I would receive 100 but got only 1. This meant that the project would be considerably more expensive, so I decided to use Noah's speaker instead, and make a prototype of the whole system I envisioned.</p>
+                <p>The idea was to make a directional speaker that could track people in space and follow them so that only they can hear the sounds. This was part of a bigger goal of encouraging people to stand and remain close together, to hear the sounds with each other.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/motor-cables.webp" alt="A NEMA 17 stepper motor.">
+                        <figcaption>I soldered my NEMA 17 stepper to a cable terminal for easier handling.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/motor-terminal.webp" alt="A 4 pin terminal.">
+                        <figcaption>This terminal which I found in the junk bin was perfect for the job as it had 0.1in spacing.</figcaption>
+                    </figure>
+                    <figure>
+                        <video controls loading="lazy" src="https://assets.nasif.co/testing-stepper.webm" alt="Stepper motor moves in a circle, stopping every 30 degrees or so."></video>
+                        <figcaption>Once I had connected it to my H Bridge module, following the steps on the stepper lab, tested it out with an example code. I noticed after leaving it on for a while it would heat up a lot. Therefore, I decided to connect the STANDBY pin to a digital pin (through a current-limiting resistor) to pull the pin LOW when no movement is expected. This kept it nice and cool to the touch.</figcaption>
+                    </figure> 
+                </div>
+                <p>Once the motor was working, I started to work on the connection to p5.js, using the information on the lab.</p>
+                <div class="image-slide">
+                    <figure>
+                        <video controls loading="lazy" src="https://assets.nasif.co/stepper-slider.webm" alt="Stepper motor controlled by an html slider on a screen."></video>
+                        <figcaption>After some tests, I got it to move with an HTML slider.</figcaption>
+                    </figure>
+                    <figure>
+                        <video controls loading="lazy" src="https://assets.nasif.co/body-track-stepper.webm" alt="Stepper motor moving in sync with a person, whose skeleton is tracked on a screen nearby."></video>
+                        <figcaption>Once that was working, I added ml5.js bodypose model and got the motor to follow my nose.</figcaption>
+                    </figure> 
+                </div>
+                <p>The general gist of the code (which is posted below at the end of this documentation post) is that the arduino receives a byte between 0-200. From 0-99, it means it must move clockwise those amounts of steps. From 100-200, it is actually counterclockwise movement, moving the received value - 100 steps counterclockwise. This logic was built in order to send messages only using bytes and keep it speedy. When a message like this arrives, the arduino moves the motor and calculates how long it will take. During this time, it does not read any messages. Once it thinks its done, it send a message back saying it is ready for a new instruction.</p>
+                <p>Now, in order to keep everything small, I considered running everything off of a Raspberry pi.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/pi-camera.webp" alt="A raspberry pi with a camera connected into a laptop through VNC">
+                        <figcaption>I borrowed a Raspberry Pi and Camera from the shop and set it up to be used with VNC from my laptop. However, when trying to run the sketch, I realized that the Pi Camera is not automatically recognized as a webcam. Therefore, to be used by p5.js, I needed to setup a server on the pi and broadcast the camera on that server. This was too much overhead for this project, also considering that the Pi takes a lot of current to power.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/mini-usb-webcam.webp" alt="Small usb webcam in front of a laptop.">
+                        <figcaption>I decided to use this tiny usb webcam instead and run everything off of my own laptop for the time being.</figcaption>
+                    </figure>
+                </div>
+                <p>With the main technical decisions, code and electronics out of the way, I proceeded with some fabrication.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/acrylic-prototype.webp" alt="A piece of laser cut acrylic.">
+                        <figcaption>I did an initial test with a scrap piece of acrylic. This shape was meant to acomodate the speaker and be folded on the top and bottom to mount onto a threaded rod.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/acrylic-test.webp" alt="A bent piece of laser cut acrylic.">
+                        <figcaption>I tried the bend and, although it broke, I also noticed that bending it caused the large hole to flare out.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/acrylic-final.webp" alt="A piece of laser cut acrylic.">
+                        <figcaption>I laser cut it again with the final acrylic and taking into account what I learned from the first prototype.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/acrylic-final-side.webp" alt="A bent piece of laser cut acrylic.">
+                        <figcaption>This one worked much better when bent, as not having the large hole made it more structurally sound.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/test-mount-speaker.webp" alt="Parametric speaker and webcam mounted on a piece of bent acrylic.">
+                        <figcaption>Now I tried mounting the speaker together with the webcam. Because I did not want to glue anything as this is just a prototype, I held the webcam in place with a large washer and a nut, that kept pressure on the back of the webcam pcb. I made sure to add two layers of non conducting tape to the back in order to avoid a short circuit with this setup.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/slip-ring-mount.webp" alt="3D model of slip ring mount.">
+                        <figcaption>With that part out of the way, I wanted to figure out how to use a slip ring that would allow the speaker to rotate continuously. I 3D modeled this piece that would screw into the threaded rod on the bottom. On the top, it would have heat-inserts in which the slip-ring can be screwed in. Then, the cables would come out the bottom of the 3D print and also out the top. Before printing, I removed the 3D threads and instead meade the bottom hole equal to the minor diameter of the rod, because the threads were too small for the printer.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/3d-print-mount.webp" alt="3D printed part on top of a threaded rod.">
+                        <figcaption>The piece came out great! I screwed the rod into it and it stayed on tightly.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/slip-ring-on-inserts.webp" alt="Slip ring being screwed onto something else.">
+                        <figcaption>I put int the heat inserts and screwed the slip ring to the top.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/usb-on-slip-ring.webp" alt="Female usb A cable soldered onto slip ring.">
+                        <figcaption>I decided to solder a female usb A cable to the slip ring on the side of the speaker, So I did not need to cut the original cable from the webcam and could later on reuse it.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/clamped-speaker.webp" alt="Parametric speaker on a custom mount">
+                        <figcaption>I tested the mount and clamped the motor to the table.</figcaption>
+                    </figure>
+                    <figure>
+                        <video controls loading="lazy" src="https://assets.nasif.co/tracking-mount.webm" alt="Stepper motor moving in sync with a person, whose skeleton is tracked on a screen nearby."></video>
+                        <figcaption>Then I tested out the program again with the mount running. At this point I realized that if I kept pulling the STANDBY pin LOW when the motor was not in use, the inertia from the speaker would keep the motor moving past the step I aimed for. Therefore, I had to keep STANDBY HIGH at all times.</figcaption>
+                    </figure> 
+                </div>
+                <p>At this point, I needed to figure out how to get the mount to stand at eye level. By talking with Niko, we thought it would be a good idea to put it on top of a light stand, screwing it in using the tradition tripod screw. I found just the right tripod sized nut in the junk bin and built it up with a light stand from the ER.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/stand-base-speaker.webp" alt="Motor mounted onto a light stand">
+                        <figcaption>Niko found this piece of metal which fit the motor perfectly. I then added the tripod sized nut and screwed it onto the light stand. I also added washers and spring washers to fastent the acrylic more strongly to the rod and avoid having it loosen through vibration.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/speaker-on-stand.webp" alt="Motor mounted onto a light stand">
+                        <figcaption>All the cables that needed to come down to the arduino and the laptop were held out of the way using some metal wire that fell in a curve, allowing the speaker to move without tangling.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/speaker-cable-management.webp" alt="Covered up cables with knitted covers.">
+                        <figcaption>I used some knitted cable cover to cover up the cable management mess, also a suggestion from Niko who did the same with his project. Here you can see one of the things I overlooked: the coupler I ordered had a flex property, which made my speaker not stand straight, but rather to wobble quite a bit.</figcaption>
+                    </figure>
+                    <figure>
+                        <video controls loading="lazy" src="https://assets.nasif.co/sound-test.webm" alt="Stepper motor moving in sync with a person. Sound is heard only when the speaker faces the camera."></video>
+                        <figcaption>This was a short test of the whole system, using some music from my laptop. You can tell how the sound can only be heard when the camera is facing the speaker directly.</figcaption>
+                    </figure> 
+                </div>
+                <p>With this, the fabrication part was done. I now wanted to experiment more with the concept behind the piece and the interactions it would allow. However, time was running out :(</p>
+                <p>I built a sketch that would detect people. If it only saw one person, the motor would move away, avoiding them. If it saw more than one person, and they were close together, the motor would insted follow them. The idea being tested out was that you can only listen to the music when being together with somebody else.</p>
+                <p>Because I arrived at this late at night, there was nobody else to test it with and see how to iterate this interaction. Upon trying it in class, it became apparent that it was too much of a complex interaction, and the users would not really understand what was going on. Danny suggested to keep looking into it, that maybe the speaker following single people would be necessary at the beginning, and then this behaviour could shift as more people come into the scene.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/speaker-in-class.webp" alt="Parametric speaker on a light stand.">
+                        <figcaption>This was a picture I took after presenting in class. At the end I was a bit dissapointed with the experience (or lack thereof) that the prototype created. It is evident that a lot of user testing is still needed to build an engaging and meaningful experience with this technical concept, which is somethign I would like to explore more in the future.</figcaption>
+                    </figure>
+                </div>
+
+                <details>
+                    <summary>Show/hide Arduino code below</summary>
+                    <pre><code class="language-c++">
+#include &lt;Stepper.h&gt;
+
+//Motor
+const int standbyPin = 7; //Set low when motor is idle to lower temperature. May affect holding torque
+const int stepsPerRevolution = 200; //Defined by the motor
+const int stepperRPM = 50;
+const int stepsPerMs = stepsPerRevolution * stepperRPM / 60000;
+bool busy = false; //Is the motor currently doing an instruction it received
+unsigned long jobStart = 0; //When did the current job start (ms, from millis())
+int jobLength = 0; //How many ms will the current job take
+
+Stepper myStepper(stepsPerRevolution, 8, 9, 10, 11);
+
+void setup() {
+    // set the speed at 50 rpm:
+    myStepper.setSpeed(stepperRPM);
+
+    //Initialize the standby pin
+    pinMode(standbyPin, INPUT);
+    digitalWrite(standbyPin, HIGH);
+
+    // initialize the serial port:
+    Serial.begin(9600);
+}
+
+void loop() {
+    //When a message from p5 is received
+    if (Serial.available() > 0 && !busy) {
+    // read the incoming byte:
+    int inByte = Serial.read();
+
+    //If it is a non-zero movement message
+    if (inByte <= 200 && inByte != 0) {
+        updatePosition(inByte); //Move motor to new position
+    } else {
+        informState(); //Inform that the motor is available
+    }
+    }
+
+    checkCurrentState(); //Check if the motor is doing a job and update variable 'busy'
+}
+
+void updatePosition(int steps) { //Move motor
+    if (steps <= 100) {
+    //From 1 to 100 the steps are counterclockwise
+    steps *= -1;
+    } else {
+    //From 101 to 200, the steps are actually 1-100 clockwise
+    steps -= 100;
+    }
+
+    //Connect the motor
+    //digitalWrite(standbyPin, HIGH);
+    //Take the instructed steps
+    myStepper.step(steps);
+    busy = true;
+    jobStart = millis();
+    //Still need to figure out how to calculate this correctly
+    //jobLength = ceil(abs(steps)/stepsPerMs);
+    jobLength = 10;
+}
+
+void informState() {
+    //Send the current state to p5
+    Serial.write(busy);
+}
+
+void checkCurrentState() {
+    if ( busy ) {
+    //If estimated job duration time has passed
+    if ( millis() - jobStart > jobLength) {
+        //Set at not busy
+        busy = false;
+
+        //Disconnect motor
+        //digitalWrite(standbyPin, LOW);
+
+        informState();
+    } else {
+        busy = true;
+    }
+    }
+}                     
+                    </code></pre>
+                </details>
+                <details>
+                    <summary>Show/hide p5.js code below</summary>
+                    <pre><code class="javascript">
+const serial = new p5.WebSerial();
+
+let inData = 0;
+let portButton;
+
+//ml5 setup
+let video;
+let bodyPose;
+let poses = [];
+let centers = [];
+// let connections;
+
+let captureAvailable = false;
+
+const globalConfidence = 0.1;
+
+let song;
+
+function preload() {
+    // Load the bodyPose model
+    bodyPose = ml5.bodyPose( {flipped: true});
+    song = loadSound('assets/merry-go-round.mp3');
+}
+
+
+function setup() {
+    createCanvas(640,480);
+    // check to see if serial is available:
+    if (!navigator.serial) {
+    alert("WebSerial is not supported in this browser. Try Chrome or MS Edge.");
+    noLoop();
+    return;
+    }
+    startSerial();
+
+    navigator.mediaDevices.enumerateDevices().then(function(devices) {
+    devices.forEach(function(device) {
+        if (device.label.includes('USB 2.0 PC Cam')) {
+        const constraints = {
+            video: {
+                deviceId: device.deviceId
+            },
+            audio: false,
+            flipped: true,
+            };
+            
+            video = createCapture(constraints);
+            video.elt.addEventListener('end', function(){
+            console.log("Video stream ended, attempting to reconnect...");
+            });
+            video.size(640, 480);
+            video.hide();
+            bodyPose.detectStart(video, gotPoses);
+            // Get the skeleton connection information
+        //   connections = bodyPose.getSkeleton();
+            captureAvailable = true;
+        }
+    });
+    });
+}
+
+function draw() {
+    background(255);
+    if (!song.isPlaying()) {
+        song.play();
+    }
+    // Draw the webcam video
+    if(captureAvailable) {
+        image(video, 0, 0, width, height);
+
+        // Draw all centers;
+        if(centers.length > 0) {
+            centers.forEach(center => {
+                noFill();
+                stroke(0,255,0);
+                line(center, 0, center, height);
+            });
+        }
+
+        //Draw the distance between each person
+        let orderedCenters = centers.slice();
+        orderedCenters.sort((a, b) => a - b);
+        for( let i = 0; i&lt;orderedCenters.length; i ++) {
+        if( i+1 < orderedCenters.length ){
+            fill(0,255,0);
+            const closestDistance = orderedCenters[i+1] - orderedCenters[i];
+            if(closestDistance < proximity) {
+                fill(0,0,255);
+                stroke(0,0,255);
+            }
+            textAlign(CENTER);
+            text(orderedCenters[i+1] - orderedCenters[i], orderedCenters[i] + (orderedCenters[i+1] - orderedCenters[i])/2, height/2 - 20);
+            line(orderedCenters[i], height/2, orderedCenters[i+1], height/2);
+        }
+        }
+    }else {
+        textAlign(CENTER);
+        text('External camera unavailable or loading :(', width/2, height/2);
+    }
+        
+    //Draw audible area
+    fill(220, 40);
+    noStroke();
+    rect( (width - audioRange)/2, 0, audioRange, height );
+}
+
+function gotPoses(results) {
+    // Save the output to the poses variable
+    poses = results;
+
+    centers = [];
+    //Run through poses and get the centers
+    for (let i = 0; i < poses.length; i++) {
+        let person = poses[i];
+        let center = false;
+        if(person.nose.confidence > globalConfidence){
+            center = person.nose.x;
+        }else if(person.right_eye.confidence > globalConfidence && person.left_eye.confidence > globalConfidence){
+            center = person.right_eye.x - person.left_eye.x;
+            const person_span = person.right_eye.x - person.left_eye.x;
+            center = person.left_eye.x + person_span/2;
+        }else if(person.right_shoulder.confidence > globalConfidence && person.left_shoulder.confidence > globalConfidence){
+            center = person.right_shoulder.x - person.left_shoulder.x;
+            const person_span = person.right_shoulder.x - person.left_shoulder.x;
+            center = person.left_shoulder.x + person_span/2;
+        }else {
+            let minX = Infinity;
+            let maxX = -Infinity;
+            person.keypoints.forEach(keypoint => {
+                if(keypoint.confidence > 0.1) {
+                    minX = min(minX, keypoint.x);
+                    maxX = max(maxX, keypoint.x);
+                }
+            });
+            const person_span = maxX - minX;
+            center = minX + person_span/2;
+        }
+
+        if(center !== false ){
+            centers.push(center);
+        }
+    }
+
+
+    if( centers.length > 0 ){
+        // targetPos = map(width/2 - centers[0], -width/2, width/2, 3, -3, true); //distance from center of screen to center of person
+        // if(Math.abs(Math.floor(targetPos)) == 1) {
+        //     targetPos = 0;
+        // }
+
+        if(centers.length >= 2){
+            const closestPair = findClosestPair(centers);
+            if( Math.abs(closestPair[0] - closestPair[1]) < proximity ) {
+                follow(closestPair[0]);
+            }
+        }else {
+            avoid();
+        }
+    }
+}
+
+let audioRange = 140;
+
+function avoid() {
+    for (const person of centers) {
+        if(person > (width - audioRange)/2 && person < (width + audioRange)/2) {
+            targetPos = random(-20, 20);
+            console.log('avoided');
+            break;
+        }
+    }
+}
+
+let proximity = 70;
+
+function follow( coord ){
+    targetPos = map(width/2 - coord, -width/2, width/2, 3, -3, true); //distance from center of screen to center of person
+    console.log('followed');
+}
+
+function findClosestPair(arr) {
+    if (arr.length < 2) {
+        return null; // Not enough numbers to compare
+    }
+    
+    // Step 1: Sort the array in ascending order
+    arr.sort((a, b) => a - b);
+    
+    // Step 2: Initialize variables to track the closest pair and the smallest difference
+    let minDiff = Infinity;
+    let closestPair = [];
+    
+    // Step 3: Iterate through the sorted array to find the smallest difference
+    for (let i = 1; i < arr.length; i++) {
+        let diff = Math.abs(arr[i] - arr[i - 1]);
+    
+        if (diff < minDiff) {
+        minDiff = diff;
+        closestPair = [arr[i - 1], arr[i]];
+        }
+    }
+    
+    return closestPair;
+    }
+
+function startSerial() {
+    // if serial is available, add connect/disconnect listeners:
+    navigator.serial.addEventListener("connect", portConnect);
+    navigator.serial.addEventListener("disconnect", portDisconnect);
+    // check for any ports that are available:
+    serial.getPorts();
+    // if there's no port chosen, choose one:
+    serial.on("noport", makePortButton);
+    // open whatever port is available:
+    serial.on("portavailable", openPort);
+    // handle serial errors:
+    serial.on("requesterror", portError);
+    // handle any incoming serial data:
+    serial.on("data", serialEvent);
+    serial.on("close", makePortButton);
+}
+
+/* SERIAL CALLBACK FUNCTIONS */
+
+// if there's no port selected, 
+// make a port select button appear:
+function makePortButton() {
+    // create and position a port chooser button:
+    portButton = createButton("choose port");
+    portButton.position(10, 10);
+    // give the port button a mousepressed handler:
+    portButton.mousePressed(choosePort);
+}
+
+// make the port selector window appear:
+function choosePort() {
+    if (portButton) portButton.show();
+    serial.requestPort();
+}
+
+// open the selected port, and make the port 
+// button invisible:
+function openPort() {
+    // wait for the serial.open promise to return,
+    // then call the initiateSerial function
+    serial.open().then(initiateSerial);
+
+    // once the port opens, let the user know:
+    function initiateSerial() {
+        console.log("port open");
+        serial.print(201);
+    }
+    // hide the port button once a port is chosen:
+    if (portButton) portButton.hide();
+}
+
+// pop up an alert if there's a port error:
+function portError(err) {
+    alert("Serial port error: " + err);
+}
+// read any incoming data as a string
+// (assumes a newline at the end of it):
+let targetPos = 0;
+let timeoutIndex = null;
+
+function serialEvent() {
+    inData = Number(serial.read());
+    //console.log(inData);
+
+    //Available for moving motor
+    if(inData == 0 ) {
+        clearTimeout(timeoutIndex);
+
+        setTimeout( function(){
+            let dataToSend = Math.floor(targetPos);
+            if( dataToSend < 0 ){
+                dataToSend = abs(dataToSend);
+                dataToSend += 100;
+            }
+            if(dataToSend != 0 ){
+                //console.log(dataToSend);
+            }
+    
+            //console.log(dataToSend);
+    
+            serial.print(dataToSend);
+            targetPos = 0;
+        }, 100);
+        
+    }//else, it is busy, wait for the 0.
+}
+
+// try to connect if a new serial port 
+// gets added (i.e. plugged in via USB):
+function portConnect() {
+    console.log("port connected");
+    serial.getPorts();
+}
+
+// if a port is disconnected:
+function portDisconnect() {
+    serial.close();
+    console.log("port disconnected");
+}
+
+function closePort() {
+    serial.close();
+}                 
+                    </code></pre>
+                </details>
+            </div>
+            <div class="blog-week">
                 <h2 class="project-subtitle">Week 05</h2>
                 <h2 style="margin-top: 1em" class="project-subtitle">Midterm</h2>
                 <p>This week I continued researching about parametric speakers, trying to best understand their limitations and their possibilites. I started testing them out with the one Noah lent me:</p>
@@ -97,7 +625,7 @@
                 <p>For a long time, I have been interested in directional speakers: sound transducers that project sound in a narrow beam, so only those in the trajectory of said beam can hear it. Normally, these speakers, like the ones from <a href="https://www.focusonics.com/" target="_blank" rel="noopener noreferrer">Focusonics</a> or <a href="https://www.indiegogo.com/projects/sray-world-s-smallest-directional-speaker#/" target="_blank" rel="noopener noreferrer">SRAY</a> are very expensive.</p>
                 <p>However, recently I have come across a low-cost way to build these speakers:</p>
                 <figure>
-                    <iframe width="560" height="315" src="https://www.youtube.com/embed/aBdVfUnS-pM?si=X2cMJItEUhlm8jxk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/aBdVfUnS-pM?si=X2cMJItEUhlm8jxk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="max-width: 80vw;"></iframe>
                     <figcaption>Short video on how to build a directional speaker that works with ultrasonic transducers.</figcaption>
                 </figure>
                 <p>I have worked with these transducers on their own somewhat before, making kind of like an ultrasonic radio, to send private messages over-the-air and sense them through haptics. In retrospect it was very ill-considered. It was an exploration on haptic commmunication, but the directionality of ultrasound did not really help: the two devices had to be pointed directly at each other. The mount design and material were not ideal either.</p>
