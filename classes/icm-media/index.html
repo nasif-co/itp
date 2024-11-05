@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ICM: Media • Nasif's ITP Blog</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/p5.min.js" defer></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/addons/p5.dom.min.js"></script> -->
+    <!-- <script type="text/javascript" src="https://rawgit.com/patriciogonzalezvivo/glslCanvas/master/dist/GlslCanvas.js"></script> -->
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Recursive:wght,CRSV,MONO@300..1000,0,0..1&family=Noto+Color+Emoji&display=block" rel="stylesheet"> 
+    <meta name="description" content="Nasif's experience at the ITP Intro to Physical Computing course.">
+    <meta name=”robots” content=”index, follow”>
+    <link rel="icon" type="image/png" href="../../favicon.png">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+</head>    
+<body>
+    <main class="page-container course-container">
+        <hgroup>
+            <p class="course-meta">Fall 2024 • Mimi Yin</p>
+            <h1 class="project-title">ICM: Media</h1>
+        </hgroup>
+        <div class="text-content">
+            <div class="blog-week">
+                <h2 class="project-subtitle">Week 08 & 09: Pixels</h2>
+                <p>This first module was all about manipulating pixels & color. For our pairs assignment we first received an initial prompt to manipulate the pixels in an image/video to create an alternative of the reality in the source image.</p>
+                <p><strong>Chris</strong> and I met and discussed some ideas to explore. We were interested in finding patterns in images, from axis of symmetry to patterns in the way the pixel colors were distributed. After this initial discussion, each of us would do some exploring before meeting again</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://www.kw-berlin.de/files/archive/kw_channa-horwitz_time-structure-composition-iii_sonakinatography-i_unframed.jpg" alt="Artwork by Chana Horwitz">
+                        <figcaption>Channa Horwitz, Time Structure Composition # III, Sonakinatography I. This image really spoke to me, it made me wonder about how the continuum of color was distributed in any given image.</figcaption>
+                    </figure>
+                </div>
+                <p>Very inspired by this work of Chana Horwitz, I wanted to see what it would look like if I drew lines between pixel in their hue order, going from the pixel with the 0 hue to the pixel with the 360 hue.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/hue-mirror.webp" alt="Webcam image with only full hue values.">
+                        <figcaption>I began by making a hue mirror, to see for myself what points of my image would be joined together. It was not really what I expected but it made me curious about a saturation mirror which was something I could not really imagine.</figcaption>
+                        <a style="display: inline-block; margin-top:1em;" href="https://editor.p5js.org/nasif-co/sketches/lQ6FzKOCVN" target="_blank" rel="noopener noreferrer">See hue mirror p5.js sketch</a>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/sat-mirror.webp" alt="Webcam image with only changes in saturation values.">
+                        <figcaption>After modifying the previous sketch, I got the saturation mirror. It's hard for me to grasp why it looks like this. The white parts are high saturation, the red parts are low saturation.</figcaption>
+                        <a style="display: inline-block; margin-top:1em;" href="https://editor.p5js.org/nasif-co/sketches/ldbGkjUri" target="_blank" rel="noopener noreferrer">See saturation mirror p5.js sketch</a>
+                    </figure>
+                </div>
+                <p>After seeing the results of these mirrors, I decided to make the "lines between ordered pixels" sketch with brightness first, since it the easiest one to recognize for me.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/sorted-lines.webp" alt="Webcam image with only full hue values.">
+                        <figcaption>This worked in a very interesting way. Because the lines are thicker when the pixels are closer together, the original images comes through, but we can also sort of discover conections between the background and foreground.</figcaption>
+                        <a style="display: inline-block; margin-top:1em;" href="https://editor.p5js.org/nasif-co/sketches/0AOs13YZO" target="_blank" rel="noopener noreferrer">See ordered lines p5.js sketch</a>
+                    </figure>
+                </div>
+                <p>At this point, we received the full prompt for the assignment, which seems we had somewhat misunderstood. We were to create a 1 minute repeatable experience in which the pixels of an image/video were manipulated to reveal/obscure some aspect of it.</p>
+                <p>After meeting with Chris again, we decided to keep exploring and see where the code could take us. After all, we can't really see what will be revealed until we make it.</p>
+                <p>At this moment I switched to working with a video, which I recorded in the Scogliera di Pontetto (Pontetto Cliffside) when I visited my brother. I'm really entranced by the way the water moves and the people float on top of its silky texture.</p>
+                <div class="image-slide">
+                    <figure>
+                        <video controls loading="lazy" src="https://assets.editor.p5js.org/670c5b6fda1724bfcf2e1772/ea95723f-672c-4697-9486-692e40843e39.mp4?v=1730837229924" alt="People swimming in the ocean."></video>
+                        <figcaption>The source video.</figcaption>
+                    </figure>
+                </div>
+                <p>At first, I was just looking to make the video loop back and forth. In trying this out with p5, I got to something interesting:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/loop-test.webp" alt="Two frames of the same video overlayed one on top of the other.">
+                        <figcaption>I was playing the video twice, one on top of the other, one going forward and one in reverse. This showed both where each person was and where they would be. A foreshadowing of their motion.</figcaption>
+                        <a style="display: inline-block; margin-top:1em;" href="https://editor.p5js.org/nasif-co/sketches/KobV3P7zk" target="_blank" rel="noopener noreferrer">See overlayed p5.js sketch</a>
+                    </figure>
+                </div>
+                <p>The next exploration then consisted on revealing motion:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/swim-trails.webp" alt="Motion trails of people swimming.">
+                        <figcaption>By filtering out pixels with hues in the range of blue, we could leave only the people, and draw each of their frames to crystallize their motion.</figcaption>
+                        <a style="display: inline-block; margin-top:1em;" href="https://editor.p5js.org/nasif-co/sketches/hJSl10IBJ" target="_blank" rel="noopener noreferrer">See motion trails p5.js sketch</a>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/sea-foam.webp" alt="Blotches of color and white in the ocean.">
+                        <figcaption>In the same vein of motion, this sketch only drew pixels that had a large change in their brightness, compared to the first frame. It kind of erased the areas of the scene that move more gently, and by filling that out with white, kind of painted sea foam.</figcaption>
+                        <a style="display: inline-block; margin-top:1em;" href="https://editor.p5js.org/nasif-co/sketches/CZxjZ5SX-" target="_blank" rel="noopener noreferrer">See Sea Foam p5.js sketch</a>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/water-ripples.webp" alt="Ondulating lines like ripples.">
+                        <figcaption>In contrast with the previous sketch, this one only renders pixels that have very very small changes in brightness compared to the first frame. By painting those slow moving areas, it kind of drew patterns of the water, like ripples.</figcaption>
+                        <a style="display: inline-block; margin-top:1em;" href="https://editor.p5js.org/nasif-co/sketches/fNj8qDoSU" target="_blank" rel="noopener noreferrer">See Water Ripples p5.js sketch</a>
+                    </figure>
+                </div>
+                <p>At this point, Chris and I met once again to do some back and forth with the ideas we had been exploring.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/consecutive-ripples.webp" alt="Ondulating lines like ripples.">
+                        <figcaption>Subtle change to the last sketch, now the brightness is compared to the previous pixel and not always to the first pixel.</figcaption>
+                        <a style="display: inline-block; margin-top:1em;" href="https://editor.p5js.org/nasif-co/sketches/fs2MDTz15" target="_blank" rel="noopener noreferrer">See Consecutive Water Ripples p5.js sketch</a>
+                    </figure>
+                </div>
+                <p>We wondered what it would be like to let the ripples draw their own image, so we did some changes to make that happen:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/long-exposure.webp" alt="Textural image of the sea.">
+                        <figcaption>After allowing it to run for a minute, the sketch generated this image. It is the result of compounding the slow moving pixels, like a long exposure. It prioritizes slow and static structures over moving ones, highlighting the underwated geography and color while leaving only spectres of the swimmers.</figcaption>
+                        <a style="display: inline-block; margin-top:1em;" href="https://editor.p5js.org/nasif-co/sketches/Ydm6t91LL" target="_blank" rel="noopener noreferrer">See Final Long Exposure p5.js sketch</a>
+                    </figure>
+                </div>
+                <p>At this point we were very happy with what we had found. We faced some problems when letting the <a href="https://editor.p5js.org/nasif-co/sketches/D34SJamiZ" target="_blank" rel="noopener noreferrer">video run on its own</a>, because sometimes the first frames would be gray. Also, because p5 was not running at full speed, it wasn't actually catching every frame of the video. To fix it in the <a href="https://editor.p5js.org/nasif-co/sketches/Ydm6t91LL" target="_blank" rel="noopener noreferrer">last iteration</a>  we controlled when to advance the video frames.</p>
+                <p>Interestingly, when we tried to advance pixel by pixel, the result was somewhat different, and people would still be shown. So we decided to advance the pixels in a randomly changing interval (kind of like what happened when letting the video run on its own) which achieved the effect we most connected with.</p>
+            </div>
+        </div>
+    </main>
+    <script src="../../js/pixelBG.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</body>
+</html>
