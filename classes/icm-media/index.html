@@ -24,6 +24,200 @@
         </hgroup>
         <div class="text-content">
             <div class="blog-week">
+                <h2 class="project-subtitle">Week 13: Final</h2>
+                <p>For the final, we were tasked with preparing a presentation of a piece of computational media. Since this week we were playtesting in PComp, I decided to focus my presentation on a concept that I developed for said project but we ultimately scrapped after playtesting.</p>
+                <p>Together with <strong>Niko Kozak</strong>, we have been working on a physical inflatable interface that hinders the vision of those who use it:</p>
+                <div class="image-slide">
+                    <figure>
+                        <video controls loading="lazy" src="https://assets.nasif.co/danny-testing.webm" alt="Hands pressing onto an inflated membrane that shows images underneath."></video>
+                        <figcaption>Interaction with the physical interface. Underneath is a screen, which was running a variation on my <a href="https://editor.p5js.org/nasif-co/sketches/gwXnUJmyQ" target="_blank" rel="noopener noreferrer">char soup sketch</a>.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/pcomp-ballon-view.webp" alt="Inflated membrane is being pushed on to reveal a part of the images underneath.">
+                        <figcaption>What most interests us is the tunnel vision it creates. When you push down on an area, you may reduce the blur enough to see the screen, but that increases the blur all around, forcing you to only see what you chose to see.</figcaption>
+                    </figure>
+                </div>
+                <p>After we arrived at this interesting phenomenon, we started working on the content we could show in the screen to highlight that and guide the interaction.</p>
+                <p>For our next prototype, we decided to make a sketch that would zoom you in, all the way from outer space into the 370 Jay street and then into the ITP floor. While Niko finished fabricating a new air-tight seal for our interface, I focused on programming this sketch.</p>
+                <p>At first I thought it would be best to load a video into p5 and, as a placeholder for our device's pressure sensor, use <code>mouseX</code> as a scrubber. Remembering the complexities I faced when working with video in p5 for the pixels exercise, I decided to instead work with Processing 4.</p>
+                <div class="image-slide">
+                    <figure>
+                        <video controls loading="lazy" src="https://assets.nasif.co/zoom-iteration-1.webm" alt="Choppy video of zooming in from outer space into new york city."></video>
+                        <figcaption>This was my attempt at building the scrubber. The source video was made in Google Earth Studio. Apparently Processing also has some complexities regarding video, which makes the scrubber not very responsive and therefore choppy.</figcaption>
+                    </figure>
+                </div>
+                <p>Looking to make it smoother I tried changing the resolution of the video and the fps to no avail. So I then decided to turn the video into an image sequence and use only a selection of still frames. I chose 39 for this.</p>
+                <div class="image-slide">
+                    <figure>
+                        <video controls loading="lazy" src="https://assets.nasif.co/zoom-iteration-2.webm" alt="Choppy video of zooming in from outer space into new york city."></video>
+                        <figcaption>Although not perfect, this was getting better. You can see each time we change from one image to the next.</figcaption>
+                    </figure>
+                </div>
+                <p>Trying to hide the "seams" visible as jumps from the previous image to the next, I decided to work out some sort of interpolation. This would be a zooming interpolation. As I move my mouse, the active image zooms in from 1 to the scale that makes it the most similar to the next image, effectively chaining zoom in effects that make it feel as a single experience:</p>
+                <div class="image-slide">
+                    <figure>
+                        <video controls loading="lazy" src="https://assets.nasif.co/zoom-iteration-3.webm" alt="Smooth video of zooming in from outer space into new york city."></video>
+                        <figcaption>Much better now. If I were to go even further, I would also add a bit of a crossfade when swapping the images, so the details that pop when swapping the image become less apparent.</figcaption>
+                    </figure>
+                </div>
+                <p>At this point I was satisfied with the visuals. The final part was adding a webcam that is shown once the zoom surpasses the roof of the 370 Jay floor.</p>
+                <details>
+                    <summary>Show/hide Processing code below</summary>
+                    <pre><code class="java">
+import processing.video.*;
+
+Capture cam;
+
+PImage[] images;
+float[] scales = {
+    1.7, //0
+    1.45, //1
+    1.45, //2
+    1.35, //3
+    1.4, //4
+    1.35, //5
+    1.4, //6
+    1.3, //7
+    1.4, //8
+    1.3, //9
+    1.3, //10
+    1.15, //11
+    1.31, //12
+    1.15, //13
+    1.15, //14
+    1.2, //15
+    1.25, //16
+    1.4, //17
+    1.3, //18
+    1.15, //19
+    1.2, //20
+    1.25, //21
+    1.12, //22
+    1.15, //23
+    1.15, //24
+    1.17, //25
+    1.2, //26
+    1.27, //27
+    1.35, //28
+    1.53, //29
+    1.35, //30
+    1.65, //31
+    1.5, //32
+    1.7, //33
+    1.7, //34
+    1.9, //35
+    1.9, //36
+    1.7, //37
+    1.7 //38
+};
+
+void setup() {
+    // Get the folder path
+    String seqFolder = sketchPath("data/seq_short");
+
+    // Load all images from the folder
+    images = loadSequence(seqFolder, "seq", "png");
+
+    // Display how many images were loaded
+    println(images.length + " images loaded.");
+    //size(1440, 810);
+    size(960, 540);
+    imageMode(CENTER);
+
+    //Start capture
+    //String[] cameras = Capture.list();
+
+    //if (cameras.length == 0) {
+    //  println("There are no cameras available for capture.");
+    //  exit();
+    //} else {
+    //  println("Available cameras:");
+    //  for (int i = 0; i < cameras.length; i++) {
+    //    println(cameras[i]);
+    //  }
+    //}
+
+    cam = new Capture(this, "pipeline:autovideosrc");
+    cam.start();
+}
+
+void draw() {
+    background(0);
+    
+    //Read the camera stream
+    if (cam.available() == true) {
+    cam.read();
+    }
+
+    //Center everything to make scaling easy
+    translate(width/2, height/2);
+    //scale(1.3);
+    
+    //Calculate how much to zoom the camera feed
+    float zoom = constrain(map(mouseX, 3*width/4 - 50, width, 1.5, 4), 1.5, 4);
+    
+    //Clear the tint
+    tint(255, 255);
+    
+    //Draw the camera
+    image(cam, 0, 0, cam.width*zoom, cam.height*zoom);
+
+    //If the mouseX is less than 3/4 of the width, draw images of the map
+    if (mouseX < 3*width/4) {
+    //Map the mouseX to an image in the array of map images.
+    float scrubberPoint = map(mouseX, 0, 3*width/4, 0, images.length-1);
+    
+    //Turn that into an integer so it can be used as a key in the array
+    int scrubber = floor(scrubberPoint);
+    
+    //In a value from 0 to 1, calculate how we are to swapping for the next image
+    float pointInBetween = scrubberPoint - scrubber;
+    
+    //Scale the current image based on that point in between and the
+    //calculate equivalent scale compared to the next image
+    //as a way of interpolating
+    scale(lerp(1, scales[scrubber], pointInBetween));
+    
+    //If we are nearing the breakpoint, start slowly fading out the image
+    //with a tint
+    if ( mouseX > (3*width/4 - 50) && mouseX < 3*width/4) {
+        float opz = constrain(map(mouseX, 3*width/4 - 50, 3*width/4, 255, 0), 0, 255) ;
+        tint(255, opz);
+    } else {
+        tint(255, 255);
+    }
+    
+    //Draw the current image
+    image(images[scrubber], 0, 0);
+    }
+}
+
+
+PImage[] loadSequence(String folder, String baseName, String extension) {
+    ArrayList&lt;PImage&gt; imageList = new ArrayList&lt;PImage&gt;();
+
+    int index = 0; // Start at the first sequence number
+    while (true) {
+    String fileName = String.format("%s%03d.%s", baseName, index, extension); // e.g., seq000.png
+    File imageFile = new File(folder, fileName);
+    if (imageFile.exists()) {
+        PImage img = loadImage(imageFile.getAbsolutePath());
+        if (img != null) {
+        imageList.add(img);
+        }
+    } else {
+        break; // Stop if the file doesn't exist
+    }
+    index++;
+    }
+
+    // Convert the ArrayList to an array and return it
+    return imageList.toArray(new PImage[0]);
+}    
+                    </code></pre>
+                </details>
+            </div>
+            <div class="blog-week">
                 <h2 class="project-subtitle">Week 10 & 11: Sound</h2>
                 <p><strong>Audrey</strong> and I paired up for this second module about making a sound experience using p5.sound.</p>
                 <div class="image-slide">
