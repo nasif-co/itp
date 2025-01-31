@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Machine Learning for Creative Coding • Nasif's ITP Blog</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/p5.min.js" defer></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/addons/p5.dom.min.js"></script> -->
+    <!-- <script type="text/javascript" src="https://rawgit.com/patriciogonzalezvivo/glslCanvas/master/dist/GlslCanvas.js"></script> -->
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Recursive:wght,CRSV,MONO@300..1000,0,0..1&family=Noto+Color+Emoji&display=block" rel="stylesheet"> 
+    <meta name="description" content="Nasif's experience at the ITP Machine Learning for Creative Computing course.">
+    <meta name=”robots” content=”index, follow”>
+    <link rel="icon" type="image/png" href="../../favicon.png">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+</head>    
+<body>
+    <main class="page-container course-container">
+        <hgroup>
+            <p class="course-meta">Fall 2024 • Daniel Shiffman</p>
+            <h1 class="project-title">Machine Learning for Creative Computing</h1>
+        </hgroup>
+        <div class="text-content">
+            <div class="blog-week" id="week-1">
+                <h2 class="project-subtitle"><u>Week 01:</u> "Excavating AI", "Humans of AI" and Image Classification</h2>
+                <p><a href="https://excavating.ai/" target="_blank" rel="noopener noreferrer">"Excavating AI"</a> uncovered a lot of the black box behind the categorization of data for AI for me. It is very confounding to see how little thought was given to some of the categories of the ImageNet dataset before proceeding with the labelling. I can't imagine what good or non-harmful use could be derived of categorizing people through such detailed and loaded classes.</p>
+                <p>The lack of context in the images is also a big issue. Vision is a time-based sense, we are continually seeing and reinterpreting our vision based on different levels of context, including the events happening immediately before. Instead, these datasets look only at one moment, extracted from time and space, ignorant to any sort of contextual clues. With this in mind, it is hard to imagine how AI systems trained on this dataset (and the clickworkers) could not get the wrong idea most of the time, when it comes to classifying people.</p>
+                <p>Some more personal levels of this context are explored in <a href="https://humans-of.ai/editorial/" target="_blank" rel="noopener noreferrer">"Humans of A.I."</a>, in which very meticulous work of archeology is done to find the original creators of the images used to train the COCO dataset, and give not only recognition to their images but also look into what these images and their subjects meant for them. Through this work it is easy to see oneself reflected in the work behind ai models, in a way they seem to be things we build together. However the way the data is treated, through obscuring and decontextualizing, breaks this apart.</p>
+                <p>I wonder about the plausibility of making fulling transparent ai models. Calls for participating in a dataset, willingly and with credits. <strong>How could these credits be a part of the model itself and not of the readme?</strong> Could one of the object literal key-value pairs, returned by the model when making a prediction, contain the name of a dataset contributor? Is there a good way to choose a contributor dynamically in a way that is also related to the prediction?</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/training-model.webp" alt="Screenshot of Teachable Machine model training UI.">
+                        <figcaption>Image of me training a Teachable Machine model to detect whether I'm facing left, right or center.</figcaption>
+                    </figure>
+                </div>
+                <p>For the exercise this week, working with image classification, I had a hard time choosing what to create. Every time I have worked with training image classification in Teachable Machine I always face the same issue that <strong>the trained model only works well in the same controlled conditions</strong>. As soon as the lighting or location changes, things start to break down.</p>
+                <p>To try to combat that, I tried training a classification model with poses instead of images per se, as I think that would make it more resistant to changing conditions.</p>
+                <p>It was really hard to get it to detect face orientation reliably. Clearly this is something better suited to an if statement but just for the sake of testing I pushed on.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/model-detect-1.webp" alt="Screenshot of p5js sketch detecting a face looking forward.">
+                        <figcaption>Detecting me looking straight forward.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/model-detect-2.webp" alt="Screenshot of p5js sketch detecting a face showing its right side.">
+                        <figcaption>Detecting the right side of my face.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/model-detect-3.webp" alt="Screenshot of p5js sketch detecting a face showing its left side.">
+                        <figcaption>Detecting the left side of my face.</figcaption>
+                    </figure>
+                </div>
+                <p>I soon figured out that the given example for p5js didnt work for this type of classification, so I had to look up how to use this type of teachable machine model with p5. I found an example by Dan O Sullivan that worked great, so I started out there.</p>
+                <p><a href="https://editor.p5js.org/nasif-co/sketches/HR9IzpmeR" target="_blank" rel="noopener noreferrer">This is the test sketch I made (pictured above)</a>, because it is using poses, I hope it will work with other people and not only me, but I have yet to test that out.</p>
+            </div>
+        </div>
+    </main>
+    <script src="../../js/pixelBG.js"></script>
+</body>
+</html>
