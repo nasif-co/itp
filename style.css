@@ -494,7 +494,8 @@ a[href]:not([href=""])[download]{
     text-decoration: underline;
 }
 
-.text-content p code {
+.text-content p code,
+.image-slide figcaption code {
     font-family: monospace;
     background-color: #d3d3d354;
     border-radius: 0.5em;

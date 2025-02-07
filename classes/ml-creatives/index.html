@@ -23,6 +23,45 @@
             <h1 class="project-title">Machine Learning for Creative Computing</h1>
         </hgroup>
         <div class="text-content">
+            <div class="blog-week" id="week-2">
+                <h2 class="project-subtitle"><u>Week 02:</u>Reading on Transfer Learning and Realtime FaceMesh UV Unwrapping</h2>
+                <p>This week I went through the additional material to understand the theory better. The <a href="https://codelabs.developers.google.com/tensorflowjs-transfer-learning-teachable-machine#2" target="_blank" rel="noopener noreferrer">Tensorflow transfer learning article</a> made the concept very clear. Made me wonder how far can we push the new data (in relation to the original training data) and still get an effective transfer learning result. 3blue1brown's videos 1 and 2 also helped me cement some more knowledge, but I still have to get around to the third part.</p>
+                <p>Afterwards I started experimenting with FaceMesh, intrigued by the possibility of mapping the face as a real-time texture. I began by trying to understand the triangle distribution:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/triangles-mismatch.webp" alt="Screenshot of triangle mesh on the top part of the image. Screenshot of javascript console on the bottom.">
+                        <figcaption>After comparing the triangles on the facemesh UV image and the triangles given by the <code>getTriangles()</code> method, I realized they are not the same, as seen on this image. Not sure why that is, but it turned out to not to cause any problems.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/spiky.webp" alt="Screenshot of face composed of misaligned triangles.">
+                        <figcaption>Trying to understand the triangles. This is the result of drawing all vertices in sequence, instead of drawing them in the order of triangles. Fun looking mistake, makes me think of new ideas.</figcaption>
+                    </figure>
+                </div>
+                <p>Once this was clear, I wanted to add the eyes onto the mesh:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/eyesocket.webp" alt="Zoomed in screenshot of 3D face with wire mesh overlayed, without eye.">
+                        <figcaption>Before stitching in the new triangles for the eyes.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/stitchedeye.webp" alt="Zoomed in screenshot of 3D face with wire mesh overlayed.">
+                        <figcaption>Result after stitching in the eyes.</figcaption>
+                        <a style="display: inline-block; margin-top:1em;" href="https://editor.p5js.org/nasif-co/sketches/-Ta6CYqsR" target="_blank" rel="noopener noreferrer">See FaceMesh with Eyes sketch</a>
+                    </figure>
+                </div>
+                <p>After this, I wanted to figure out how to flatten the face. How to get a realtime unwrapped UV map of the face.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/facemeshuv.webp" alt="Screenshot of face mesh in green over black background.">
+                        <figcaption>I used the <code>getUVCoords()</code> method to get the static 2D locations of each vertex of the face model. These I then mapped to the dimensions of the canvas.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/face-unwrap.webp" alt="Zoomed in grayscale screenshot of UV unwrapped face texture.">
+                        <figcaption>I then created the geometry using the static locations, but gave it a dynamic UV map based on the realtime location of each vertex on the webcam video, flattening the face no matter where it was at. It looks very janky on the edges, but It makes sense given it has less pixel information there.</figcaption>
+                        <a style="display: inline-block; margin-top:1em;" href="https://editor.p5js.org/nasif-co/sketches/8fWhs1Sok" target="_blank" rel="noopener noreferrer">See Realtime UV Unwrap Sketch</a>
+                    </figure>
+                </div>
+            </div>
             <div class="blog-week" id="week-1">
                 <h2 class="project-subtitle"><u>Week 01:</u> "Excavating AI", "Humans of AI" and Image Classification</h2>
                 <p><a href="https://excavating.ai/" target="_blank" rel="noopener noreferrer">"Excavating AI"</a> uncovered a lot of the black box behind the categorization of data for AI for me. It is very confounding to see how little thought was given to some of the categories of the ImageNet dataset before proceeding with the labelling. I can't imagine what good or non-harmful use could be derived of categorizing people through such detailed and loaded classes.</p>
