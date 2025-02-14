@@ -23,6 +23,52 @@
             <h1 class="project-title">Machine Learning for Creative Computing</h1>
         </hgroup>
         <div class="text-content">
+            <div class="blog-week" id="week-3">
+                <h2 class="project-subtitle"><u>Week 03:</u> Photogrammetry with Depth Estimation</h2>
+                <p>As soon as we saw the depth estimation model example in class, I was immediately intrigued. My experience with depth sensing had always been with the very specialized depth cameras or kinect derivatives. I wanted to see what a point cloud would look like with this model:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/point-cloud-1.webp" alt="Screenshot of man made up of pixels in a 3D space.">
+                        <figcaption>Here I drew the input from the webcam in 3D space, making one <code>plane</code> for each pixel, and using the estimated depth as the z.</figcaption>
+                        <a style="display: inline-block; margin-top:1em;" href="https://editor.p5js.org/nasif-co/sketches/h3WR7pLn2" target="_blank" rel="noopener noreferrer">See Point Cloud sketch</a>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/point-cloud-2.webp" alt="Screenshot of man made up of pixels in a 3D space.">
+                    </figure>
+                </div>
+                <p>This was very exciting! But since these were just points, when you turned you could see through them. I wanted to try and build a 3D model with this. So I started to look into p5 geometries. Because this was a more intensive process, I couldn't make it run continuously but rather require the user input to take a picture.</p>
+                <p>I made a loop that would add each 3D "pixel" of the image to a p5 geometry and set its faces manually:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/photogram1.webp" alt="Screenshot of 3D model with the silhouette of a bust in the corner.">
+                        <figcaption>At first I couldn't understand why my objects had so much dead space around. In the end it turned out to be just that the first rendering had that problem. After rendering more "pictures" it worked as expected</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/3dfaces.webp" alt="Screenshot of 3D model zoomed in.">
+                        <figcaption>I had a hard time coding the faces of the model, since the <code>computeFaces()</code> function didn't do a very good job due to the complexity of the shape.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/photogramstl.webp" alt="Screenshot of 3D model of a bust.">
+                        <figcaption>Once I had the faces figured out, I had the model! This is a view of the 3D model as an STL file, downloaded on my computer.</figcaption>
+                    </figure>
+                </div>
+                <p>With the shape set, I couldn't help but want to texture it with the photo that was captured through the webcam! Since I learned how this worked from last week's experiments, I set up the UVs to make it possible:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/photogram-textured.webp" alt="Screenshot of 3D model of a man and a photo of them below it.">
+                        <figcaption>I love the low poly look it gives. I wonder how much it would change if I generated the model with more pixels.</figcaption>
+                        <a style="display: inline-block; margin-top:1em;" href="https://editor.p5js.org/nasif-co/sketches/LX-ixVFlB" target="_blank" rel="noopener noreferrer">See Photogrammetry Photo Booth Sketch</a>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/hand-depth.webp" alt="Screenshot of 3D model of a man with their hand stretched out.">
+                        <figcaption>It looks best when varying depths are part of the picture. I could imagine this sort of image being used in a poster.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/watch-depth.webp" alt="Screenshot of 3D model of a man with their hand stretched out.">
+                    </figure>
+                </div>
+                <p>I'm really drawn to the creative possibilities of this method. I wonder if there's any way of optimizing what I'm doing further, so that we can get it running somewhat close to realtime. But maybe p5 is not the best platform for this.</p>
+            </div>
             <div class="blog-week" id="week-2">
                 <h2 class="project-subtitle"><u>Week 02:</u>Reading on Transfer Learning and Realtime FaceMesh UV Unwrapping</h2>
                 <p>This week I went through the additional material to understand the theory better. The <a href="https://codelabs.developers.google.com/tensorflowjs-transfer-learning-teachable-machine#2" target="_blank" rel="noopener noreferrer">Tensorflow transfer learning article</a> made the concept very clear. Made me wonder how far can we push the new data (in relation to the original training data) and still get an effective transfer learning result. 3blue1brown's videos 1 and 2 also helped me cement some more knowledge, but I still have to get around to the third part.</p>
