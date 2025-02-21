@@ -23,6 +23,45 @@
             <h1 class="project-title">Machine Learning for Creative Computing</h1>
         </hgroup>
         <div class="text-content">
+            <div class="blog-week" id="week-4">
+                <h2 class="project-subtitle"><u>Week 04:</u> Proposal: Footmark to Pose Estimation</h2>
+                <p>For this week, I began thinking about a project suitable for training a neural network. Ever since I have been making interactive experiences, I have been writing algorithms to try to detect and react to people.</p>
+                <p>When I have attempted to "translate" some sensor data to a real-life parameter (for example, the readings of an HC-SR04 to the distance of a user), I have often experienced how my <strong>algorithm fails in some unforeseen edge case</strong> (ex. as a user approaches my prototype, somebody passes by and confuses the sensor).</p>
+                <p>The solution has usually been reworking my algorithm, adding more sensors to expand the "sensing field" of my system and/or iterating on the affordances of my prototype to better shape users' interaction intuitions. This usually takes me about 90% of the way there, to the point where breaks in the system are usually noticeable only to me and my teammates.</p>
+                <p>However, I can't shake the feeling that, if I could rework my algorithm very very meticulously, <strong>if I could consider most edge cases and their complex interconnections</strong>, I could perhaps bypass the need of adding extra sensors. Or maybe get closer to the 99% of functioning. <strong>This is what I think training a neural network could achieve</strong>, atleast in some cases.</p>
+                <p>Last semester, working on <a href="http://nasif.co/projects/trails" target="_blank" rel="noopener noreferrer">Trails Overhead</a> with Audrey Oh, I had this intuition. We had built a velostat mat and were trying to translate the pressure points into the real-life parameter of where the feet are (and whose feet are whose):</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/raw-data.webp" alt="Grid with each cell in a shade of gray and a corresponding number.">
+                        <figcaption>The raw data coming in from the velostat mat. Here, one person is walking north to south.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/marching-squares-1.webp" alt="Grid of cells in shades of gray. A red outline around the darker areas.">
+                        <figcaption>Using a marching squares algorithm to find footprints on the data. The next step we tried was estimating the angle of the foot, drawing a line across its longest side.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/marching-squares-2.webp" alt="Grid of cells in shades of gray. A red outline around the darker areas.">
+                        <figcaption>Quickly it was evident that, with this sensor resolution, translating the footsteps to the "real-life" parameters was very complex.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/final-visual.webp" alt="Blurry visual with darker spots and blurred out gray spots.">
+                        <figcaption>In the end we decided to keep our final visual closer to the original data, allowing users to imagine and interpret the data themselves.</figcaption>
+                    </figure>
+                </div>
+                <p>In this scenario, I can't help but think that writing an algorithm is possible, just very very complex. I also have the theory that, because balance ourselves on our feet, any pose we do must have some (maybe minute) changes in weight distribution on our feet, which could be sensed.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/training-sketch.webp" alt="Line drawing. Person standing on top of a grid mat. On the right, a top-down view of the grid mat. The cells where the person is standing are colored in shades of gray. Below that, the points where the persons joints are, are shown in green.">
+                        <figcaption>This is the training scenario I imagine, capturing data at the same time from the mat and two views of the person, using ml5 pose estimation.</figcaption>
+                    </figure>
+                </div>
+                <p>By training a model this way, I want to explore the possibilities that using a sensor like this for high fidelity pose estimation could give.</p>
+                <p><strong>Inputs:</strong> Velostat pressure sensor pixel buffer, maybe as a 16x16 grayscale image. Or maybe just as a one-dimensional array of grayscale pixels.</p>
+                <p><strong>Outputs:</strong> XYZ points of the joints of the person with respect to the mat. Might focus on a small set of points for the initial testing.</p>
+                <p><strong>Learning task:</strong> I'm not sure yet, It seems to me that it would be similar to a classification of sorts.</p>
+                <p><strong>Challenges:</strong> I worry that the resolution of the velostat mat might be too low to give the model enough information. Also, I worry that this task may be too complicated to be trained on the browser. But I am unsure of this. I also worry about the latency when capturing data. What if the velostat readings are available faster/slower than the ml5 ones?</p>
+                <p>For this first test, I want to limit the training data to just one user at a time.</p>
+            </div>
             <div class="blog-week" id="week-3">
                 <h2 class="project-subtitle"><u>Week 03:</u> Photogrammetry with Depth Estimation</h2>
                 <p>As soon as we saw the depth estimation model example in class, I was immediately intrigued. My experience with depth sensing had always been with the very specialized depth cameras or kinect derivatives. I wanted to see what a point cloud would look like with this model:</p>
