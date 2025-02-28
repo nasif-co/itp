@@ -23,6 +23,64 @@
             <h1 class="project-title">Machine Learning for Creative Computing</h1>
         </hgroup>
         <div class="text-content">
+            <div class="blog-week" id="week-5">
+                <h2 class="project-subtitle"><u>Week 05:</u> Initial attempts at training a regression CNN</h2>
+                <p>To record the data to train a model based on my proposal, I built a local p5.js sketch that receives the pressure sensitive mat data through websockets, visualizes it and at the same time runs the ml5.js BlazePose model on the webcam. Specifically pointing out the lower body points in x, y and z.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/recording-mat.webp" alt="Web interface with 16x16 grayscale image on the left, webcam image on the right and a red button below that reads start.">
+                        <figcaption>The interface during data recording.</figcaption>
+                    </figure>
+                </div>
+                <p>Upon hitting record, the sketch adds the data to the ml5 neural network model object every 200ms, only if the last received mat readings through websockets and the last predicted blazepose keypoints are in time sync.</p>
+                <p>After recording, I proceeded to save the data to json and make a sketch to train the model. Since this was a <strong>regression task with convolutional layers</strong>, I was a bit at a loss as to how to structure the architecture of the model, since the only CNN that ml5 has is the <code>imageClassification</code> task. I tested out a few configurations based on LLM recommendations, this one was the one that made most sense to me with regards to how I understand the way CNNs work:</p>
+                <pre><code class="javascript">
+layers: [
+    { 
+        type: 'conv2d', 
+        filters: 8, 
+        kernelSize: 3, 
+        activation: 'relu', 
+        inputShape: [16, 16, 1] 
+    },
+    { 
+        type: 'maxPooling2d', 
+        poolSize: [2, 2] 
+    },
+    { 
+        type: 'conv2d', 
+        filters: 16, 
+        kernelSize: 3, 
+        activation: 'relu'
+    },
+    { 
+        type: 'maxPooling2d', 
+        poolSize: [2, 2]
+    },
+    { 
+        type: 'flatten'
+    },
+    { 
+        type: 'dense',
+        units: 32,
+        activation: 'relu' },
+    { 
+        type: 'dense', 
+        units: 30 }
+]
+                </code></pre>
+                <p>However, all of the ones I tested had the same issue: my loss graph immediately went to 0 after the first epoch:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/failed-training.webp" alt="Tensorflow.js debugging panel showing a loss graph that dips down to 0 after the first epoch.">
+                        <figcaption>The loss graph. Clearly indicating an issue.</figcaption>
+                    </figure>
+                </div>
+                <p>Seems to me that either my layer structure is wrong or my training data is not correclty formatted. This is what I used:</p>
+                <p><strong>Input:</strong> a 256 long one dimensional array of values between 0 and 1, representing the level of pressure on the mat at each point.</p>
+                <p><strong>Outputs:</strong> 30 separate single values, each corresponding to one of the x,y,z coordinates of one of the lower body pose keypoints.</p>
+
+            </div>
             <div class="blog-week" id="week-4">
                 <h2 class="project-subtitle"><u>Week 04:</u> Proposal: Footmark to Pose Estimation</h2>
                 <p>For this week, I began thinking about a project suitable for training a neural network. Ever since I have been making interactive experiences, I have been writing algorithms to try to detect and react to people.</p>
@@ -185,5 +243,7 @@
         </div>
     </main>
     <script src="../../js/pixelBG.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
 </body>
 </html>
