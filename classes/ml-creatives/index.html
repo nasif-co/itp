@@ -24,7 +24,7 @@
         </hgroup>
         <div class="text-content">
             <div class="blog-week" id="week-5">
-                <h2 class="project-subtitle"><u>Week 05:</u> Initial attempts at training a regression CNN</h2>
+                <h2 class="project-subtitle"><u>Week 05 & 06</u> ML sketch: Footmark to Keypoint Estimation</h2>
                 <p>To record the data to train a model based on my proposal, I built a local p5.js sketch that receives the pressure sensitive mat data through websockets, visualizes it and at the same time runs the ml5.js BlazePose model on the webcam. Specifically pointing out the lower body points in x, y and z.</p>
                 <div class="image-slide">
                     <figure>
@@ -66,23 +66,93 @@ layers: [
         activation: 'relu' },
     { 
         type: 'dense', 
-        units: 30 }
+        units: 30 
+    }
 ]
                 </code></pre>
+                <p><strong>Input:</strong> a 256 long one dimensional array of values between 0 and 1, representing the level of pressure on the mat at each point.</p>
+                <p><strong>Outputs:</strong> 30 separate single values, each corresponding to one of the x,y,z coordinates of one of the lower body pose keypoints.</p>
                 <p>However, all of the ones I tested had the same issue: my loss graph immediately went to 0 after the first epoch:</p>
                 <div class="image-slide">
                     <figure>
                         <img loading="lazy" src="https://assets.nasif.co/failed-training.webp" alt="Tensorflow.js debugging panel showing a loss graph that dips down to 0 after the first epoch.">
                         <figcaption>The loss graph. Clearly indicating an issue.</figcaption>
                     </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/ml5-tweaks.webp" alt="Tensorflow.js debugging panel showing a loss graph that dips down and wiggles around 0.04.">
+                        <figcaption>After tweaking the training parameters during class and adding ml5 data normalization function, even though the data is already normalized.</figcaption>
+                    </figure>
                 </div>
-                <p>Seems to me that either my layer structure is wrong or my training data is not correclty formatted. This is what I used:</p>
-                <p><strong>Input:</strong> a 256 long one dimensional array of values between 0 and 1, representing the level of pressure on the mat at each point.</p>
-                <p><strong>Outputs:</strong> 30 separate single values, each corresponding to one of the x,y,z coordinates of one of the lower body pose keypoints.</p>
+                <p>Seemed to me that there could be many issues:</p>
+                <p><ul>
+                    <li>Too few datapoints was causing it to overfit</li>
+                    <li>ML5 was not liking me doing a regression with convolutional layers</li>
+                    <li>Training data was not correclty formatted</li>
+                    <li>Layer structure was wrong</li>
+                </ul></p>
+                <p>A few days later, I went back to export my data and run some predictions to see how it worked. When I tried to train again, I got this error originating in ML5's callcallback.js file, after a few epochs:</p>
+                <br><pre><code class="javascript
+                ">Uncaught (in promise) TypeError: t is not a function</code></pre><br>
+                <p>Right around then, Fabri had told me he faced some similar issues and he managed to go past them by training and running the model directly with Tensorflow.js. He shared his code and I worked from there to transfer my project to Tensorflow.js:</p> 
+                <p><strong>Input:</strong> Tensor with the shape [16, 16, 1] corresponding to the pixels from the mat.</p>
+                <p><strong>Outputs:</strong> Tensor with 30 discrete values.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/tensorflow-1.webp" alt="Loss graph from training a CNN.">
+                        <figcaption>My first run at training the model in tensorflow.js using the data collected before. Around 400 datapoints. I graphed the loss on excel because I didn't manage to set up the tf visor.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/training-tensorflow.webp" alt="Web interface with camera feed on the right, pixelated grayscale image on the left and a button on the bottom left labelled Start.">
+                        <figcaption>Got set up for another round of data collection, this time I recorded around 1,300 data samples.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/tensorflow-2.webp" alt="Loss graph from training a CNN.">
+                        <figcaption>Loss graph from my second round of training with the new data.</figcaption>
+                    </figure>
+                </div>
+                <p>This was my architecture and training parameters:</p>
+                <pre><code class="javascript">
+model = tf.sequential();
+model.add(tf.layers.conv2d({
+    filters: 8,
+    kernelSize: 3,
+    activation: 'relu',
+    inputShape: [16, 16, 1]
+}));
+model.add(tf.layers.maxPooling2d({ poolSize: [2, 2] }));
 
+model.add(tf.layers.conv2d({
+    filters: 16,
+    kernelSize: 3,
+    activation: 'relu'
+}));
+model.add(tf.layers.maxPooling2d({ poolSize: [2, 2] }));
+
+model.add(tf.layers.flatten());
+model.add(tf.layers.dense({ units: 32, activation: 'relu' }));
+model.add(tf.layers.dense({ units: 30 }));
+
+model.compile({
+    optimizer: tf.train.adam(0.0001),
+    loss: 'meanSquaredError'
+});
+            </code></pre>
+            <div class="image-slide">
+                <figure>
+                    <video muted controls loading="lazy" src="https://assets.nasif.co/predictions.webm" alt="Man walking on top of rubber mat, while a ML model tries to estimate the position of his feet, knees and hips."></video>
+                    <figcaption>Realtime estimations made by this model.</figcaption>
+                </figure>
+            </div>
+            <p>Overall I feel like a model of this type could work! The next steps I envision for this are:</p>
+            <p><ul>
+                <li>Tweaking the visualization to see the Z coordinate better and be able to evaluate the accuracy.</li>
+                <li>Preprocessing the mat image with marching squares blob detection before passing it onto the model to reduce noise.</li>
+                <li>Training with more datapoints.</li>
+                <li>Training with a higher resolution mat.</li>
+            </ul></p>
             </div>
             <div class="blog-week" id="week-4">
-                <h2 class="project-subtitle"><u>Week 04:</u> Proposal: Footmark to Pose Estimation</h2>
+                <h2 class="project-subtitle"><u>Week 04</u> ML Sketch Proposal: Footmark to Pose Estimation</h2>
                 <p>For this week, I began thinking about a project suitable for training a neural network. Ever since I have been making interactive experiences, I have been writing algorithms to try to detect and react to people.</p>
                 <p>When I have attempted to "translate" some sensor data to a real-life parameter (for example, the readings of an HC-SR04 to the distance of a user), I have often experienced how my <strong>algorithm fails in some unforeseen edge case</strong> (ex. as a user approaches my prototype, somebody passes by and confuses the sensor).</p>
                 <p>The solution has usually been reworking my algorithm, adding more sensors to expand the "sensing field" of my system and/or iterating on the affordances of my prototype to better shape users' interaction intuitions. This usually takes me about 90% of the way there, to the point where breaks in the system are usually noticeable only to me and my teammates.</p>
@@ -121,7 +191,7 @@ layers: [
                 <p>For this first test, I want to limit the training data to just one user at a time.</p>
             </div>
             <div class="blog-week" id="week-3">
-                <h2 class="project-subtitle"><u>Week 03:</u> Photogrammetry with Depth Estimation</h2>
+                <h2 class="project-subtitle"><u>Week 03</u> Photogrammetry with Depth Estimation</h2>
                 <p>As soon as we saw the depth estimation model example in class, I was immediately intrigued. My experience with depth sensing had always been with the very specialized depth cameras or kinect derivatives. I wanted to see what a point cloud would look like with this model:</p>
                 <div class="image-slide">
                     <figure>
@@ -167,7 +237,7 @@ layers: [
                 <p>I'm really drawn to the creative possibilities of this method. I wonder if there's any way of optimizing what I'm doing further, so that we can get it running somewhat close to realtime. But maybe p5 is not the best platform for this.</p>
             </div>
             <div class="blog-week" id="week-2">
-                <h2 class="project-subtitle"><u>Week 02:</u>Reading on Transfer Learning and Realtime FaceMesh UV Unwrapping</h2>
+                <h2 class="project-subtitle"><u>Week 02</u> Reading on Transfer Learning and Realtime FaceMesh UV Unwrapping</h2>
                 <p>This week I went through the additional material to understand the theory better. The <a href="https://codelabs.developers.google.com/tensorflowjs-transfer-learning-teachable-machine#2" target="_blank" rel="noopener noreferrer">Tensorflow transfer learning article</a> made the concept very clear. Made me wonder how far can we push the new data (in relation to the original training data) and still get an effective transfer learning result. 3blue1brown's videos 1 and 2 also helped me cement some more knowledge, but I still have to get around to the third part.</p>
                 <p>Afterwards I started experimenting with FaceMesh, intrigued by the possibility of mapping the face as a real-time texture. I began by trying to understand the triangle distribution:</p>
                 <div class="image-slide">
@@ -209,7 +279,7 @@ layers: [
                 <p>It sort of makes sense considering the model is meant to add fun 3D effects to/around the face, and not actually make accurate photogrammetry. This I think is something creators need to understand before making experiences using the model, as the depiction of the user's 3D face on screen is a distortion of their real appearance.</p>
             </div>
             <div class="blog-week" id="week-1">
-                <h2 class="project-subtitle"><u>Week 01:</u> "Excavating AI", "Humans of AI" and Image Classification</h2>
+                <h2 class="project-subtitle"><u>Week 01</u> "Excavating AI", "Humans of AI" and Image Classification</h2>
                 <p><a href="https://excavating.ai/" target="_blank" rel="noopener noreferrer">"Excavating AI"</a> uncovered a lot of the black box behind the categorization of data for AI for me. It is very confounding to see how little thought was given to some of the categories of the ImageNet dataset before proceeding with the labelling. I can't imagine what good or non-harmful use could be derived of categorizing people through such detailed and loaded classes.</p>
                 <p>The lack of context in the images is also a big issue. Vision is a time-based sense, we are continually seeing and reinterpreting our vision based on different levels of context, including the events happening immediately before. Instead, these datasets look only at one moment, extracted from time and space, ignorant to any sort of contextual clues. With this in mind, it is hard to imagine how AI systems trained on this dataset (and the clickworkers) could not get the wrong idea most of the time, when it comes to classifying people.</p>
                 <p>Some more personal levels of this context are explored in <a href="https://humans-of.ai/editorial/" target="_blank" rel="noopener noreferrer">"Humans of A.I."</a>, in which very meticulous work of archeology is done to find the original creators of the images used to train the COCO dataset, and give not only recognition to their images but also look into what these images and their subjects meant for them. Through this work it is easy to see oneself reflected in the work behind ai models, in a way they seem to be things we build together. However the way the data is treated, through obscuring and decontextualizing, breaks this apart.</p>
