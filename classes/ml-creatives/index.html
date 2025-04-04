@@ -23,6 +23,47 @@
             <h1 class="project-title">Machine Learning for Creative Computing</h1>
         </hgroup>
         <div class="text-content">
+            <div class="blog-week" id="week-8">
+                <h2 class="project-subtitle"><u>Week 08</u> Depth Estimation Playground</h2>
+                <p>Ever since a couple of weeks ago, when doing my first experiments with depth estimation, I've been somewhat enthralled by its graphic qualities. It feels particularly magical to be able to somewhat derive depth from a flat image, like enhancing a memory.</p>
+                <p>I wanted to be able to play with this more easily, so I built an online tool to apply it to any image uploaded or captured by the webcam:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/homescreen.webp" alt="Homescreen of a website with two buttons, each offering different ways of uploading an image.">
+                        <figcaption>The interface homescreen.</figcaption>
+                        <a style="display: inline-block; margin-top:1em;" href="https://extrude.nasif.co" target="_blank" rel="noopener noreferrer">Visit tool online</a>
+                    </figure>
+                </div>
+                <p>After making the web app and sharing it with some friends, it became clear that I needed to add controls for the depth. Since the models do monocular depth estimation, they can't really tell the absolute z depths. This is apparently a very complex problem due to how different lenses portray depth. With this done, I tested it out on some images:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/3dfruits.webp" alt="3D rendition of a fruit shop.">
+                        <figcaption>3D Fruit shop in Rome.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/fruits.webp" alt="Photo of a fruit shop.">
+                        <figcaption>Source image of the fruit shop.</figcaption>
+                    </figure>
+                </div>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/bust.webp" alt="3D rendition of a bust wearing a face mask.">
+                        <figcaption>3D bust with face mask.</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/classic.webp" alt="Photo of a bust with a face mask.">
+                        <figcaption>Source image of the bust.</figcaption>
+                    </figure>
+                </div>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/gwangju.webp" alt="3D rendition of a street in Gwangju, Korea.">
+                        <figcaption>3D street in Gwangju, Korea. Source was a 360 photo!</figcaption>
+                    </figure>
+                </div>
+                <p>These explorations opened up some interesting creative possibilities. I want to keep exploring 360 images, as well as images of locations, which seem to look the most realistic.</p>
+                <p>Furthermore, I want to extend the tool so that I may add multiple 3D images to a same "canvas" and create a composition by moving them around and setting different depths. This way I can prototype how it could work to stitch them together.</p>
+            </div>
             <div class="blog-week" id="week-5">
                 <h2 class="project-subtitle"><u>Week 05 & 06</u> ML sketch: Footmark to Keypoint Estimation</h2>
                 <p>To record the data to train a model based on my proposal, I built a local p5.js sketch that receives the pressure sensitive mat data through websockets, visualizes it and at the same time runs the ml5.js BlazePose model on the webcam. Specifically pointing out the lower body points in x, y and z.</p>
