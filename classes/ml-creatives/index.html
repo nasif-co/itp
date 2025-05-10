@@ -23,6 +23,63 @@
             <h1 class="project-title">Machine Learning for Creative Computing</h1>
         </hgroup>
         <div class="text-content">
+            <div class="blog-week" id="final">
+                <h2 class="project-subtitle"><u>Final Experiment:</u> Live Diorama</h2>
+                <p>After building my depth estimation tool, I played around with images to see which ones felt more interesting to me.</p>
+                <p>Quickly it became evident that I was most drawn to 3D models of spaces. These felt very lifelike; small dioramas of scenes I captured. It feels most magical to see the flat photos of spaces be stretched in the 3 dimensions, looking almost like what they looked like when I capture them.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img src="https://assets.nasif.co/staircase.webp" alt="Man walking up a staircase.">
+                        <figcaption>Extrusion of an old picture of me going up a staircase.</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="https://assets.nasif.co/turrell.webp" alt="People sitting down in a room looking at a rectangular opening in the ceiling.">
+                        <figcaption>Extrusion of the James Turrell piece at the MoMa PS1.</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="https://assets.nasif.co/beach.webp" alt="Rocky beach.">
+                        <figcaption>Extrusion of beach picture.</figcaption>
+                    </figure>
+                </div>
+                <p>Thinking about spaces, I was reminded of the gif <u>Audrey Oh</u> and I made on our first semester:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/stopping-traffic.gif" alt="Animated gif showing one person passing an umbrella to another person across two separate frames.">
+                        <figcaption>Jaywalking (2024)</figcaption>
+                    </figure>
+                </div>
+                <p>To record it, we used the feed of nyc dot traffic cameras available online. These cameras take pictures every few seconds, saved as low resolution images. These conditions are perfect for the browser based depth estimation models, since it gives them time to do the estimation and don't have that many pixels.</p>
+                <p>Therefore, I wondered what a live-updating diorama of Manhattan would look like and how to navigate it. So, I decided to do a test build of a Brooklyn intersection I know very well and happens to have three traffic cameras.</p>
+                <p>I began by porting my <a href="https://editor.p5js.org/nasif-co/sketches/LX-ixVFlB" target="_blank" rel="noopener noreferrer">Photo(grammetry) Booth</a> sketch to do server side depth estimation and building the <code>.obj</code>, so that the front-end sketch only had to render and update the 3d model and texture.</p>
+                <p>Unfortunately, with transformers.js this could now only use cpu to run the model, but it still worked pretty fast at this scale. I built the frontend on p5.js and began experimenting how to place the three views of the Sand St. and Jay St. intersection.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/p5-diorama.webp" alt="Pixelated 3d models over black background.">
+                        <figcaption>Attempting to place the 3D views in p5 using transformation functions.</figcaption>
+                    </figure>
+                </div>
+                <p>After a couple of hours trying this out, it was clear that p5 was not a very good place to try to place 3D models, using only <code>translate()</code>, <code>rotate()</code> and <code>scale()</code>. So I decided to migrate to A-FRAME.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img loading="lazy" src="https://assets.nasif.co/aframe-inspector.webp" alt="Screenshot of 3D software moving a 3D model.">
+                        <figcaption>Using the A-FRAME inspector to place the views in space.</figcaption>
+                    </figure>
+                </div>
+                <p>A-FRAME's visual inspector allowed me to have more control over placing the models, although it was still not an easy feat. Because the cameras don't contain any attached data (latitude/longitude, direction of view, absolute height) it means I have to estimate it by ear for each camera. I made an attempt at this with the intersection:</p>
+                <figure>
+                    <video controls src="https://assets.nasif.co/aframe-stitched.webm" alt="Navigating a 3D environment with updating 3D models."></video>
+                    <figcaption>Showcasing an imperfect stitching of the updating 3D models. Especially on the two intersecting views you can see the 3D models don't fit exactly, but still represent the same realtime objects at the same time.</figcaption>
+                </figure>
+                <p>It's not perfect, but it's a good start that showed me there maybe was a chance this could work.</p>
+                <p>The next steps in this project are:</p>
+                <ul>
+                    <li>Tweak the 3D model update system on the frontend, to avoid a flash of unloaded content.</li>
+                    <li>Make the model's texture transparent in areas where the change in depth is too large for the voxels to actually be connected.</li>
+                    <li>Remove voxels that have a z = 0 depth, as these become a sort of background that could cover actual depth information from other views</li>
+                    <li>Place a flat map on the "floor" as an alignment guide.</li>
+                </ul>
+                <p>Ultimately, I am still intrigued by this idea. Although it is evidently becoming a sort of digital-craft project, I think it could reach a novel view of our map. However, I can not tell for sure until more views get mapped out.</p>
+            </div>
             <div class="blog-week" id="week-8">
                 <h2 class="project-subtitle"><u>Week 08</u> Depth Estimation Playground</h2>
                 <p>Ever since a couple of weeks ago, when doing my first experiments with depth estimation, I've been somewhat enthralled by its graphic qualities. It feels particularly magical to be able to somewhat derive depth from a flat image, like enhancing a memory.</p>
