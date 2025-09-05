@@ -163,6 +163,11 @@ p em {
     font-style: italic;
 }
 
+h2 em,
+h3 em {
+    font-style: italic;
+}
+
 .description p {
     margin-bottom: 1em;
 }
@@ -369,17 +374,25 @@ a[href]:not([href=""])[download]{
     font-weight: 800;
 }
 
+.section-subheading {
+    --fsz: 20;
+    font-weight: 800;
+    margin-top: 1.2em;
+}
+
 .course-meta {
     margin-bottom: 0.5em;
 }
 
 .text-content h2,
+.text-content h3,
 .text-content p,
 .text-content ul {
     max-width: 600px;
 }
 
 .text-content h2,
+.text-content h3,
 .text-content p,
 .text-content li {
     margin-bottom: 0.5em;
@@ -417,6 +430,10 @@ a[href]:not([href=""])[download]{
 @media screen and (max-width: 992px) {
     .project-subtitle {
         --fsz: 20;
+    }
+
+    .section-subheading {
+        --fsz: 18;
     }
 
     .project-title {
@@ -535,6 +552,10 @@ a[href]:not([href=""])[download]{
 
 .text-content ul {
     list-style: disc inside;
+}
+
+.text-content ul ul {
+    margin-left: 10px;
 }
 
 /* Highlight.js styles */

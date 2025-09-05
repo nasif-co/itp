@@ -23,6 +23,47 @@
             <h1 class="project-title">Understanding Networks</h1>
         </hgroup>
         <div class="text-content">
+            <div class="blog-week" id="week-1">
+                <h2 class="project-subtitle"><u>Week 01</u> Setting up a host, firewall and readings</h2>
+                <h3 class="section-subheading">Droplet and Server</h3>
+                <p>After being put on an activation hold by Digital Ocean for a day, everything went smoothly. I configured the server with an ssh key but later realized that, since that key was for the <code>root</code> user, and I preferred not reusing it, I'd have to make a new key.</p>
+                <p>So I followed <a href="https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server">digital ocean's ssh key guide</a> and created a new one, saving the passphrase to my keychain and setting up my <code>.ssh/config</code> file nicely:</p>
+                <pre>
+<code class="console">Host uplink
+    HostName &lt;server public IP&gt;
+    User &lt;username&gt;
+    IdentityFile &lt;path to private key&gt;
+    AddKeysToAgent yes
+    UseKeychain yes
+</code>
+                </pre>
+                <p> so I only have to type:</p>
+                <pre>
+<code class="console">$ssh uplink</code>
+                </pre>
+                <p>To log into my server. This took longer than I had planned but felt very nice to have a clean setup.</p>
+                <p>I then had to briefly stop working on the server and forgot to power it off. When I came back a couple of hours later I setup the firewall and in a few minutes It had already blocked 64 connections. I wonder what could have been happening in that time the server was running without a firewall.</p>
+                <p>Currently running the server for a few days before I do the firewall analysis</p>
+                <h3 class="section-subheading">Notes on Deb Chachra's <em>How Infrastructure Shapes Us</em></h3>
+                <ul>
+                    <li>Chachra's argument on how infrastructure, something 'invisible'/taken for granted, deeply shape our lives resonates strongly with a lot of Georges Perec's philosophy of the infraordinary. I especially enjoy his text <a href="https://summitsguide.wordpress.com/wp-content/uploads/2014/10/approaches-to-what.pdf" target="_blank" rel="noopener noreferrer">Approaches to What?</a>, an invitation to look closely at the overlooked.</li>
+                    <li>Moving to NYC and away from the systems I'm accustomed to in Colombia has made it at times easy to identify the differences in infrastructure that shape our experience:</li>
+                    <ul>
+                        <li>Surge pricing on electricity: seasons mean energy usage varies across the year. So the required size of the grid is unclear, it is strained in the winter and underused in the summer.</li>
+                        <li>Lack of water meters: water tends to be included in rent. Individual water usage is not tracked and not charged. In some cases there is little deterrence from irresponsible consumption and waste.</li>
+                        <li>Same with hot water. Heating is done in the scope of the building. In Colombia, water heating is done through each apartment's water heater.</li>
+                    </ul>
+                </ul>
+                <h3 class="section-subheading">Notes on <em>Why Google Went Offline Today and a Bit about How the Internet Works</em></h3>
+                <ul>
+                    <li>I had no idea about the Border Gateway Protocol (BGP), and Autonomous Systems (AS) numbers. I knew how the internet was a network of networks but didn't have a very clear image of how these get connected.</li>
+                    <li>Would love to know more about where in this whole process DNS fits in with regards to BGP.</li>
+                </ul>
+                <h3 class="section-subheading"> Notes on <em>We finally know what caused the global tech outage – and how much it cost</em></h3>
+                <ul>
+                    <li>It's intriguing to see how software can also be infrastructure, and how certain software infrastructures operate at a global level while being maintained by a single company. I assume, mostly due to lack of alternative softwares in niche markets and user reluctance to upgrade/migrate.</li>
+                </ul>
+            </div>
         </div>
     </main>
     <script src="../../js/pixelBG.js"></script>
