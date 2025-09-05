@@ -159,7 +159,8 @@ li strong {
     font-weight: 600;
 }
 
-p em {
+p em,
+li em {
     font-style: italic;
 }
 
