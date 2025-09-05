@@ -288,6 +288,19 @@ a[href]:not([href=""])[download]{
     transition: font-weight 0.3s;
 }
 
+.class-link a:not([href]) {
+    cursor: not-allowed;
+    opacity: 0.2;
+    user-select: none;
+}
+
+.tippy-box {
+    border-radius: 1em;
+    background: white;
+    box-shadow: 0px 0px 3px 1.2px rgba( 0, 0, 0, 0.15);
+    color: black;
+}
+
 @media (hover: hover) {
     .class-link a:hover {
         font-weight: 950;

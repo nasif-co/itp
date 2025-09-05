@@ -30,10 +30,22 @@
         </div>
         <ul class="class-list">
             <li>
+                <h2 class="semester">Fall 2025</h2>
+                <ul>
+                    <li class="class-link"><a href="classes/networks/">Understanding Networks</a></li>
+                    <li class="class-link"><a href="classes/critical-objects/">Critical Objects</a></li>
+                    <li class="class-link"><a href="classes/time/">Time</a></li>
+                    <li class="class-link"><a>Becoming</a></li>
+                    <li class="class-link"><a>Thesis I</a></li>
+                </ul>
+            </li>
+            <li>
                 <h2 class="semester">Spring 2025</h2>
                 <ul>
                     <li class="class-link"><a href="classes/studio/">Studio</a></li>
                     <li class="class-link"><a href="classes/ml-creatives/">Machine Learning for Creative Computing</a></li>
+                    <li class="class-link"><a>Electronics for Inventors</a></li>
+                    <li class="class-link"><a>Playful Communication of Serious Research</a></li>
                 </ul>
             </li>
             <li>
@@ -43,13 +55,27 @@
                     <li class="class-link"><a href="classes/fabrication/">Intro to Fabrication</a></li>
                     <li class="class-link"><a href="classes/hypercinema/">Hypercinema</a></li>
                     <li class="class-link"><a href="classes/icm-media/">ICM: Media</a></li>
-                    <!-- <li class="class-link"><a href="classes/embodied-web/">Experiments on the Embodied Web</a></li>
-                    <li class="class-link"><a href="classes/applications/">Applications</a></li> -->
+                    <li class="class-link"><a>Experiments on the Embodied Web</a></li>
+                    <li class="class-link"><a>Applications</a></li>
                 </ul>
             </li>
             
         </ul>
     </main>
+
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            tippy('.class-link a:not([href])', {
+                content: 'No blog for this class :/',
+                theme: 'light',
+                followCursor: true,
+                arrow: false,
+                hideOnClick: false,
+            });
+        });
+    </script>
     <script src="js/pixelBG.js"></script>
 </body>
 </html>
