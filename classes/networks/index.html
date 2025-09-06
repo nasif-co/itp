@@ -44,6 +44,21 @@
                 <p>To log into my server. This took longer than I had planned but felt very nice to have a clean setup.</p>
                 <p>I then had to briefly stop working on the server and forgot to power it off. When I came back a couple of hours later I setup the firewall and in a few minutes It had already blocked 64 connections. I wonder what could have been happening in that time the server was running without a firewall.</p>
                 <p>Currently running the server for a few days before I do the firewall analysis</p>
+                <h3 class="section-subheading">Firewall Log Analysis</h3>
+                <p>After running the server for a couple of days, I passed the logs to an excel sheet for analysis. Replacing spaces with tabs didn't work well for me when passing it to excel, so I instead replaced them with commas and used excel's text-to-columns feature.</p>
+                <ul>
+                    <li><strong>Blocked Connections:</strong> 3849</li>
+                    <li><strong>Number of Unique IPs:</strong> 2116</li>
+                    <li><strong>Most attempts from one IP:</strong> 54 attempts</li>
+                    <li><strong>Location of said IP:</strong> Ashburn, VA Amazon Data Services Northern Virginia</li>
+                </ul>
+                <p>Since its been visiting my IP so much, I decided to visit theirs. Curiously, it served a directory list.</p>
+                <p>I opened each file. Turns out that one file contains a bunch of entries with the format:</p>
+                <pre>
+Discovered open port 5900/tcp on X.X.X.X   
+                </pre>
+                <p>So it seems this is some sort of scanner, discovering IP addresses where port 5900 is open. I looked it up and <strong>this is the port used by VNC</strong>. I've used VNC before to connect to a raspberry pi, so I imagine all of these IP addresses are allowing connections to remote control of a graphical desktop interface. Looking up the IP in AbuseIPDB said it has 16% confidence that it is an abusive host.</p>
+                <p>This made me worry a bit more about the short time my server was running without a firewall, so I looked it up and found you can check the authentication logs to see successful logins. I used <code>grep</code> to only see lines with successful logins and everything made sense with when I have logged in.</p>
                 <h3 class="section-subheading">Notes on Deb Chachra's <em>How Infrastructure Shapes Us</em></h3>
                 <ul>
                     <li>Chachra's argument on how infrastructure, something 'invisible'/taken for granted, deeply shape our lives resonates strongly with a lot of Georges Perec's philosophy of the infraordinary. I especially enjoy his text <a href="https://summitsguide.wordpress.com/wp-content/uploads/2014/10/approaches-to-what.pdf" target="_blank" rel="noopener noreferrer">Approaches to What?</a>, an invitation to look closely at the overlooked.</li>
