@@ -23,6 +23,48 @@
             <h1 class="project-title">Understanding Networks</h1>
         </hgroup>
         <div class="text-content">
+            <div class="blog-week" id="week-2">
+                <h2 class="project-subtitle"><u>Week 02</u> Traceroute and Network Mapping</h2>
+                <h3 class="section-subheading">Tracerouting to a Phone on IPV6</h3>
+                <p>Reading the prompt, I became intrigued by the idea of tracerouting to my phones IP (given my phone is connected to cellular data). I got my phone's public address from <a href="http://ip2location.com" target="_blank" rel="noopener noreferrer">ip2location.com</a>, which interestingly only gave me an IPV6 address.</p>
+                <p>I found the <code>traceroute6</code> command and gave it a try but immediately got:</p>
+                <pre>
+<code class="console">connect: No route to host</code>
+                </pre>
+                <p>Reading more on it, and seeing the same result when running <code>traceroute6 google.com</code>, I came to the conclusion that my ISP does not have IPV6 support on for my home network.</p>
+                <p>So I tried instead to use my phones IPV4, and got up to 13 hops before getting into private hosts without response:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img src="https://assets.nasif.co/traceroute-phone.webp" alt="Map connecting lines inside of New York City and to Boston.">
+                        <figcaption>The traceroute did a few hops around NYC before jumping to Boston and then not reporting back anymore.</figcaption>
+                    </figure>
+                </div>
+                <h3 class="section-subheading">Identifying Autonomous Systems</h3>
+                <p>After this, I attempted to traceroute to some sites I frequent. Very quickly I realized that almost every single time I would get timeouts on hops. So I decided to instead focus on the AS numbers and trying to identify what Autonomous Systems I pass through often.</p>
+                <p>I used <code>traceroute -a host | grep -o '\[AS[0-9]\+\]'</code> for the following sites:</p>
+                <ul>
+                    <li>google.com</li>
+                    <li>nyu.edu</li>
+                    <li>github.com</li>
+                    <li>chase.com</li>
+                    <li>instagram.com</li>
+                    <li>amazon.com</li>
+                    <li>nytimes.com</li>
+                    <li>itsnicethat.com</li>
+                </ul>
+                <p>A lot of hops returned no answer. But with the ones that did I compiled this list:</p>
+                <pre>
+[AS7843]	38	Charter Communications Inc (Spectrum)
+[AS12271]	27	Charter Communications Inc (Spectrum)
+[AS15169]	9	Google LLC
+[AS33182]	8	HostDime.com, Inc.
+[AS3356]	3	Level 3 Parent, LLC
+[AS32934]	3	Facebook
+[AS6461]	1	Zayo Bandwidth
+[AS5773]	1	BCN Telecom Inc
+                </pre>
+                <p>Its no surprise that spectrum is the main Autonomous System I pass through since they are my ISP. The rest of them are also not very unusual, but I would need to make a larger amount of traceroutes to get a better picture of my common networking routes.</p>
+            </div>
             <div class="blog-week" id="week-1">
                 <h2 class="project-subtitle"><u>Week 01</u> Setting up a host, firewall and readings</h2>
                 <h3 class="section-subheading">Droplet and Server</h3>
