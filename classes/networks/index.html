@@ -64,6 +64,9 @@
 [AS5773]	1	BCN Telecom Inc
                 </pre>
                 <p>Its no surprise that spectrum is the main Autonomous System I pass through since they are my ISP. The rest of them are also not very unusual, but I would need to make a larger amount of traceroutes to get a better picture of my common networking routes.</p>
+                <h3 class="section-subheading">Cloudflare's AI Labyrinth</h3>
+                <p>Last week in class I mentioned having read about cloudflare intentionally trapping AI scrapers into a loop of hops and redirects. I looked into it again, reading <a href="https://blog.cloudflare.com/ai-labyrinth/" target="_blank" rel="noopener noreferrer">Cloudflare's blog post on the subject</a>.</p>
+                <p>How I explained it was not entirely accurate. The way it is explained in the linked article says that bots are sent into AI generated web pages that have internal links to more AI generated pages, essentially making them crawl sites that are not a real part of the visited site. In doing so, they waste their resources and time. Cloudflare also uses this a specialized tool to identify aggressive AI crawlers, which are the ones that will go deeper into the labyrinth.</p>
             </div>
             <div class="blog-week" id="week-1">
                 <h2 class="project-subtitle"><u>Week 01</u> Setting up a host, firewall and readings</h2>
