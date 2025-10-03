@@ -23,6 +23,43 @@
             <h1 class="project-title">Time</h1>
         </hgroup>
         <div class="text-content">
+            <div class="blog-week" id="week-3">
+                <h2 class="project-subtitle"><u>Week 03</u> Hardware Clock</h2>
+                <p>For this weeks assignment, I wanted to experiment with mechanical relays. To me, their ticking sound and movement is very similar to the geneva mechanism that drives some traditional clocks dials, and the sound of the pendulum.</p>
+                <div class="image-slide">
+                    <figure>
+                        <video src="https://assets.nasif.co/relay-clock.webm" controls></video>
+                        <figcaption>5 mechanical relays run by a microcontroller at different intervals.</figcaption>
+                    </figure>
+                </div>
+                <p>The clock I built has 5 sound "dials", each one activated on a different interval, but all multiples of 200ms, as can be seen in the code:</p>
+                <pre><code class="language-c++">
+const int numPins = 5;
+const int pins[numPins] = {3, 4, 5, 6, 7};
+int state[numPins] = {HIGH, HIGH, HIGH, HIGH, HIGH};
+unsigned long last[numPins] = {0, 0, 0, 0, 0,};
+int interval[numPins] = {200, 400, 600, 800, 1000};
+
+void setup() {
+  for (int i = 0; i < numPins; i++) {
+    pinMode(pins[i], OUTPUT);
+  }
+}
+
+void loop() {
+  for (int i = 0; i < numPins; i++) {
+    if (millis() - last[i] > interval[i]) {
+      last[i] = millis();
+      state[i] = state[i] == HIGH ? LOW : HIGH;
+      digitalWrite(pins[i], state[i]);
+    }
+  }
+
+}
+                </code></pre>
+                <p>However, as heard in the video, these relays fall out of sync. I imagined I would be able to hear them ticking at the same time, just some of them would "chime in" less frequently than others. Nonetheless, as time passes, they fall further and further out of sync.</p>
+                <p>I imagine this is due to the speed of the armature not being fast enough to 'hit' right on the beat. But I also wonder if my code is slowly compounding a distance between them through the <code>last</code> value for each one, causing them to drift apart over time. This drifting apart is to me a very beautiful phenomenon, especially because, for short moments, they come back in sync.</p>
+            </div>
             <div class="blog-week" id="week-2">
                 <h2 class="project-subtitle"><u>Week 02</u> The Inconstant Moon, Hardware and Patterns</h2>
                 <h3 class="section-subheading">Dendrochronology</h3>
