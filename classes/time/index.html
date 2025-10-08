@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Time • Nasif's ITP Blog</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/p5.min.js" defer></script>
@@ -7,15 +8,18 @@
     <!-- <script type="text/javascript" src="https://rawgit.com/patriciogonzalezvivo/glslCanvas/master/dist/GlslCanvas.js"></script> -->
     <link rel="stylesheet" type="text/css" href="../../style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
-    <link href="https://fonts.googleapis.com/css2?family=Recursive:wght,CRSV,MONO@300..1000,0,0..1&family=Noto+Color+Emoji&display=block" rel="stylesheet"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Recursive:wght,CRSV,MONO@300..1000,0,0..1&family=Noto+Color+Emoji&display=block"
+        rel="stylesheet">
     <meta name="description" content="Nasif's experience at the ITP Time course.">
     <meta name=”robots” content=”index, follow”>
     <link rel="icon" type="image/png" href="../../favicon.png">
     <meta name="theme-color" content="#ffffff">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8" />
-</head>    
+</head>
+
 <body>
     <main class="page-container course-container">
         <hgroup>
@@ -23,16 +27,46 @@
             <h1 class="project-title">Time</h1>
         </hgroup>
         <div class="text-content">
+            <div class="blog-week" id="week-4">
+                <h2 class="project-subtitle"><u>Week 04</u> Software Clock</h2>
+                <p>For my software clock, I kept thinking about the way timezones are defined by longitudes, which are
+                    an interesting way to slice the Earth. I don't think we usually feel a particular connection with
+                    other in our same longitude, atleast not those far north/south.</p>
+                <p>Looking it up, in reality the timezones are way more complicated than that unfortunately. The sun is
+                    not the main player in determining times. Politics and society play a big role:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/World_Time_Zones_Map.svg/2880px-World_Time_Zones_Map.svg.png"
+                            alt="Map of the world divided into timezones.">
+                        <figcaption>This is the timezones map from wikipedia, showing how longitudes are only the
+                            initial consideration, modified by national borders and desires to not split countries in
+                            time.</figcaption>
+                    </figure>
+                </div>
+                <p>I find this particularly interesting on a personal level because Bogotá, the city where I've lived a
+                    good portion of my life, and New York City share longitudes.</p>
+                <p>So I decided to make a clock that would make these linear connections explicit, by showing you your
+                    microtimezone and the time on it: Normally, <strong>in UTC time, 1 hour is equivalent to 15º of
+                        separation in longitude.</strong> Therefore, we are more or less (not in all cases) grouped into
+                    15º chunks and assigned the same time for the whole slice.</p>
+                <p>However, if 15º is 1 hour, this means that <strong>0.00416667º is 1 second. This logic splits the
+                        earth in ~86,400 ultra accurate timezones.</strong> This is what my software clock does:
+                    <strong>it shows you the time in your current microtimezone, detected through GPS</strong>.</p>
+                <iframe src="https://nasif-co.github.io/microtime" style="width: min(100%, 800px); height: 60vh;" frameborder="0"></iframe>
+                <p>(The clock will not work well without permission to access GPS). You can <a href="https://nasif-co.github.io/microtime" target="_blank" rel="noopener noreferrer">access it online here</a> and <a href="https://github.com/nasif-co/microtime" target="_blank" rel="noopener noreferrer">see the code on github</a>.</p>
+            </div>
             <div class="blog-week" id="week-3">
                 <h2 class="project-subtitle"><u>Week 03</u> Hardware Clock</h2>
-                <p>For this weeks assignment, I wanted to experiment with mechanical relays. To me, their ticking sound and movement is very similar to the escapement mechanism that drives mechanical clocks.</p>
+                <p>For this weeks assignment, I wanted to experiment with mechanical relays. To me, their ticking sound
+                    and movement is very similar to the escapement mechanism that drives mechanical clocks.</p>
                 <div class="image-slide">
                     <figure>
                         <video src="https://assets.nasif.co/relay-clock.webm" controls></video>
                         <figcaption>5 mechanical relays run by a microcontroller at different intervals.</figcaption>
                     </figure>
                 </div>
-                <p>The clock I built has 5 sound "dials", each one activated on a different interval, but all multiples of 200ms, as can be seen in the code:</p>
+                <p>The clock I built has 5 sound "dials", each one activated on a different interval, but all multiples
+                    of 200ms, as can be seen in the code:</p>
                 <pre><code class="language-c++">
 const int numPins = 5;
 const int pins[numPins] = {3, 4, 5, 6, 7};
@@ -57,16 +91,34 @@ void loop() {
 
 }
                 </code></pre>
-                <p>However, as heard in the video, these relays fall out of sync. I imagined I would be able to hear them ticking at the same time, just some of them would "chime in" less frequently than others. Nonetheless, as time passes, they fall further and further out of sync.</p>
-                <p>I imagine this is due to the speed of the armature not being fast enough to 'hit' right on the beat. But I also wonder if my code is slowly compounding a distance between them through the <code>last</code> value for each one, causing them to drift apart over time. This drifting apart is to me a very beautiful phenomenon, especially because, for short moments, they come back in sync.</p>
+                <p>However, as heard in the video, these relays fall out of sync. I imagined I would be able to hear
+                    them ticking at the same time, just some of them would "chime in" less frequently than others.
+                    Nonetheless, as time passes, they fall further and further out of sync.</p>
+                <p>I imagine this is due to the speed of the armature not being fast enough to 'hit' right on the beat.
+                    But I also wonder if my code is slowly compounding a distance between them through the
+                    <code>last</code> value for each one, causing them to drift apart over time. This drifting apart is
+                    to me a very beautiful phenomenon, especially because, for short moments, they come back in sync.
+                </p>
             </div>
             <div class="blog-week" id="week-2">
                 <h2 class="project-subtitle"><u>Week 02</u> The Inconstant Moon, Hardware and Patterns</h2>
                 <h3 class="section-subheading">Dendrochronology</h3>
-                <p>Thinking about a natural pattern that had special meaning for me, I was brought back to a qualm I usually have with woodworking. Despite how much I enjoy it, it feels like whatever I make has to be grand enough to have warranted the tree's contribution. And even then, I feel only certain masterpieces achieve that.</p>
-                <p>This definitely has to do with the age of trees and the fact that they can easily outlive us. So I decided to focus on the age of trees and the way they record their time through their rings. This, I came to find out, is called <strong>dendrochronology</strong> and it is paired with <strong>dendroclimatology</strong> as the rings not only keep track of years, but also provide hints as to the climate of each year.</p>
-                <p>Each ring consists of a paler lighter section (spring and early summer wood) and a darker denser section (late summer and fall wood). Generally, a ring can be thought of as a year (although under stress this is not always the case).</p>
-                <p>I came across a great public dataset of dendrochronology named Urudendro, including images of yellow pines from the north of Uruguay. I built a small code sketch that would simulate a timelapse of their rings and allow us to see how they grew and the time they kept. The original sketch has the whole 64 trees, but this video excerpt shows just three:</p>
+                <p>Thinking about a natural pattern that had special meaning for me, I was brought back to a qualm I
+                    usually have with woodworking. Despite how much I enjoy it, it feels like whatever I make has to be
+                    grand enough to have warranted the tree's contribution. And even then, I feel only certain
+                    masterpieces achieve that.</p>
+                <p>This definitely has to do with the age of trees and the fact that they can easily outlive us. So I
+                    decided to focus on the age of trees and the way they record their time through their rings. This, I
+                    came to find out, is called <strong>dendrochronology</strong> and it is paired with
+                    <strong>dendroclimatology</strong> as the rings not only keep track of years, but also provide hints
+                    as to the climate of each year.</p>
+                <p>Each ring consists of a paler lighter section (spring and early summer wood) and a darker denser
+                    section (late summer and fall wood). Generally, a ring can be thought of as a year (although under
+                    stress this is not always the case).</p>
+                <p>I came across a great public dataset of dendrochronology named Urudendro, including images of yellow
+                    pines from the north of Uruguay. I built a small code sketch that would simulate a timelapse of
+                    their rings and allow us to see how they grew and the time they kept. The original sketch has the
+                    whole 64 trees, but this video excerpt shows just three:</p>
                 <div class="image-slide">
                     <figure>
                         <video src="https://assets.nasif.co/dendrochronology.mp4" controls></video>
@@ -75,30 +127,50 @@ void loop() {
                 </div>
                 <h3 class="section-subheading">Notes on The Inconstant Moon</h3>
                 <ul>
-                    <li>Our experience of life and time was so intertwined with the celestial bodies, that it seems unbelievable how we have completely abstracted time from them.</li>
-                    <li>It feels to me that mechanical clocks act like a microcosm of the orbits/rotations of celestial bodies. They're like having a realtime link to the sky on our wrists.</li>
-                    <li>The religious link with timekeeping makes sense. In spanish the word for 'Sky' and 'Heaven' is one and the same: 'Cielo'. Therefore, it is clear how our spirituality has been linked with the cosmos and timekeeping can be, in a way, keeping track of the heavens.</li>
+                    <li>Our experience of life and time was so intertwined with the celestial bodies, that it seems
+                        unbelievable how we have completely abstracted time from them.</li>
+                    <li>It feels to me that mechanical clocks act like a microcosm of the orbits/rotations of celestial
+                        bodies. They're like having a realtime link to the sky on our wrists.</li>
+                    <li>The religious link with timekeeping makes sense. In spanish the word for 'Sky' and 'Heaven' is
+                        one and the same: 'Cielo'. Therefore, it is clear how our spirituality has been linked with the
+                        cosmos and timekeeping can be, in a way, keeping track of the heavens.</li>
                 </ul>
                 <h3 class="section-subheading">Notes on Moore's Wall and Singularity</h3>
                 <ul>
-                    <li>Last year I attended a lecture by Tandon Dean Juan de Pablo on his research in developing methods for the reliable construction of integrated circuits with microscopic circuits inside. It was fascinating to see and also daunting to consider how humanity has pushed the limits of their senses to advance technology.</li>
-                    <li>I used to have the feeling that Moore's law was plateauing. That we were reaching some diminishing returns. However, with the prevalence of machine learning, it feels the speed at which we move has multiplied. Sometimes feels too fast for our senses, in the same way as the previous point.</li>
-                    <li>The idea of the singularity as described in most of the chapter relies too heavily on science fiction. The idea of an unforeseen property of the internet "suddenly awakening" makes it sound as if the internet was a mythological beast. This sort of rhetoric just feels fatalistic.</li>
-                    <li>Some aspects however are interesting, like the idea of loosing the ability of prediction because of speed. How prediction is rooted on observation and analysis of repetitions, and how this practice might become impossible if less iterations happen on the way to the future. Unknowability then feels like a real possibility.</li>
+                    <li>Last year I attended a lecture by Tandon Dean Juan de Pablo on his research in developing
+                        methods for the reliable construction of integrated circuits with microscopic circuits inside.
+                        It was fascinating to see and also daunting to consider how humanity has pushed the limits of
+                        their senses to advance technology.</li>
+                    <li>I used to have the feeling that Moore's law was plateauing. That we were reaching some
+                        diminishing returns. However, with the prevalence of machine learning, it feels the speed at
+                        which we move has multiplied. Sometimes feels too fast for our senses, in the same way as the
+                        previous point.</li>
+                    <li>The idea of the singularity as described in most of the chapter relies too heavily on science
+                        fiction. The idea of an unforeseen property of the internet "suddenly awakening" makes it sound
+                        as if the internet was a mythological beast. This sort of rhetoric just feels fatalistic.</li>
+                    <li>Some aspects however are interesting, like the idea of loosing the ability of prediction because
+                        of speed. How prediction is rooted on observation and analysis of repetitions, and how this
+                        practice might become impossible if less iterations happen on the way to the future.
+                        Unknowability then feels like a real possibility.</li>
                 </ul>
             </div>
             <div class="blog-week" id="week-1">
                 <h2 class="project-subtitle"><u>Week 01</u> Readings and Sundial</h2>
                 <h3 class="section-subheading">Sundial</h3>
-                <p>After researching sundials, I realized their geometry is pretty tightly connected to the latitude in which they are placed, as well as the direction of true north. This makes sundials too site-specific and require some calculation to set up properly, which I don't really enjoy.</p>
-                <p>So I decided to make a sundial that is modular, in the sense that the user can add their own hourly markings based on the shadows they see. This way, there's no need to point north and the angle of the gnomon is not a big issue.</p>
+                <p>After researching sundials, I realized their geometry is pretty tightly connected to the latitude in
+                    which they are placed, as well as the direction of true north. This makes sundials too site-specific
+                    and require some calculation to set up properly, which I don't really enjoy.</p>
+                <p>So I decided to make a sundial that is modular, in the sense that the user can add their own hourly
+                    markings based on the shadows they see. This way, there's no need to point north and the angle of
+                    the gnomon is not a big issue.</p>
                 <div class="image-slide">
                     <figure>
                         <img loading="lazy" src="https://assets.nasif.co/mahogany.webp" alt="Piece of mahogany.">
                         <figcaption>I found this piece of mahogany in the wood scrap bin.</figcaption>
                     </figure>
                     <figure>
-                        <img loading="lazy" src="https://assets.nasif.co/roughcut.webp" alt="Rough cut of a circle of wood.">
+                        <img loading="lazy" src="https://assets.nasif.co/roughcut.webp"
+                            alt="Rough cut of a circle of wood.">
                         <figcaption>Roughly approximated a circle with the band saw.</figcaption>
                     </figure>
                     <figure>
@@ -106,46 +178,75 @@ void loop() {
                         <figcaption>And then cleaned up the cut with the belt sander.</figcaption>
                     </figure>
                     <figure>
-                        <img loading="lazy" src="https://assets.nasif.co/tapping.webp" alt="Metal tube with threads inside.">
-                        <figcaption>I took a 6061 aluminum tube from the vertical scrap and tapped it so I could fasten it to the wooden base with a screw and then use it as a gnomon.</figcaption>
+                        <img loading="lazy" src="https://assets.nasif.co/tapping.webp"
+                            alt="Metal tube with threads inside.">
+                        <figcaption>I took a 6061 aluminum tube from the vertical scrap and tapped it so I could fasten
+                            it to the wooden base with a screw and then use it as a gnomon.</figcaption>
                     </figure>
                     <figure>
-                        <img loading="lazy" src="https://assets.nasif.co/platecut.webp" alt="Piece of carbon steel with a circular cut on it.">
-                        <figcaption>I wanted to have a magnetic metal plate on top of the base, so I scanned the wood base to get its exact shape and then laser cut a piece of carbon steel sheet that Ian kindly provided.</figcaption>
+                        <img loading="lazy" src="https://assets.nasif.co/platecut.webp"
+                            alt="Piece of carbon steel with a circular cut on it.">
+                        <figcaption>I wanted to have a magnetic metal plate on top of the base, so I scanned the wood
+                            base to get its exact shape and then laser cut a piece of carbon steel sheet that Ian kindly
+                            provided.</figcaption>
                     </figure>
                     <figure>
                         <img loading="lazy" src="https://assets.nasif.co/nodus.webp" alt="3D printed cap.">
-                        <figcaption>I 3D modelled a simple cap for the gnomon and Niko to print it in his bamboo printer using clear polycarbonate.</figcaption>
+                        <figcaption>I 3D modelled a simple cap for the gnomon and asked Niko to print it in his bamboo
+                            printer using clear polycarbonate.</figcaption>
                     </figure>
                     <figure>
-                        <img loading="lazy" src="https://assets.nasif.co/preassembly.webp" alt="Metal tube and round wooden piece with metal plate on top.">
-                        <figcaption>After sanding the wood up to 1500 grit, buffing the metal plate and shining it, and attaching the cap, the sundial was ready for assembly.</figcaption>
+                        <img loading="lazy" src="https://assets.nasif.co/preassembly.webp"
+                            alt="Metal tube and round wooden piece with metal plate on top.">
+                        <figcaption>After sanding the wood up to 1500 grit, buffing the metal plate shining it and
+                            attaching the cap, the sundial was ready for assembly.</figcaption>
                     </figure>
                 </div>
                 <div class="image-slide">
                     <figure>
                         <img loading="lazy" src="https://assets.nasif.co/sundial-a.webp" alt="Wood and metal sundial.">
-                        <figcaption>This was the result. Using magnets, users can add their own markings, making their own "watchface", even adding little paper notes.</figcaption>
+                        <figcaption>This was the result. Using magnets, users can add their own markings, making their
+                            own "watchface", even adding little paper notes.</figcaption>
                     </figure>
                     <figure>
                         <img loading="lazy" src="https://assets.nasif.co/sundial-b.webp" alt="Wood and metal sundial.">
-                        <figcaption>Unfortunately I didn't yet get a chance to see it with the sunlight on it.</figcaption>
+                        <figcaption>Unfortunately I didn't yet get a chance to see it with the sunlight on it.
+                        </figcaption>
                     </figure>
                 </div>
                 <h3 class="section-subheading">Notes on <em>Kairos and Chronos</em></h3>
                 <ul>
-                    <li>It is daunting to think of our responsibility to the future people. Younger generations can often feel that our elders and ancestors did not have that responsibility with us, and it can feel overwhelming to try to correct a course that has been ongoing for longer than multiple of our individual lifespans.</li>
-                    <li>Slowness feels like a good answer, but by no means a trend. The most recent slowness I remember was the 2020 pandemic, forcing a pause, a slow down. But the ramp up after has been vicious. It feels like we can only slow down and reconsider at the verge of the collective abyss.</li>
-                    <li>The same situation occurred with rebuilding the ozone, where the Montréal Protocol was set at the cusp of irreversible crisis.</li>
-                    <li>Slowness feels like an unrealistic expectation, history tends to show that humanity has extremely short foresight, but at the same time, unimaginable effectiveness in the face of imminent danger.</li>
+                    <li>It is daunting to think of our responsibility to the future people. Younger generations can
+                        often feel that our elders and ancestors did not have that responsibility with us, and it can
+                        feel overwhelming to try to correct a course that has been ongoing for longer than multiple of
+                        our individual lifespans.</li>
+                    <li>Slowness feels like a good answer, but by no means a trend. The most recent slowness I remember
+                        was the 2020 pandemic, forcing a pause, a slow down. But the ramp up after has been vicious. It
+                        feels like we can only slow down and reconsider at the verge of the collective abyss.</li>
+                    <li>The same situation occurred with rebuilding the ozone, where the Montréal Protocol was set at
+                        the cusp of irreversible crisis.</li>
+                    <li>Slowness feels like an unrealistic expectation, history tends to show that humanity has
+                        extremely short foresight, but at the same time, unimaginable effectiveness in the face of
+                        imminent danger.</li>
                 </ul>
                 <h3 class="section-subheading">Notes on <em>The Clock We Live On: Following the Sun</em></h3>
                 <ul>
-                    <li>The use of water and weights to measure time is fascinating, especially the clepsydra and the way a float was used very elegantly in conjunction to a rack and pinion connected to a dial.</li>
+                    <li>The use of water and weights to measure time is fascinating, especially the clepsydra and the
+                        way a float was used very elegantly in conjunction to a rack and pinion connected to a dial.
+                    </li>
                     <li>The etymology of the minute and second.</li>
-                    <li>I have heard about so called 'Brothel Candles' or <strong>'Pocket Candles'</strong>, which burned for 7 minutes more or less precisely. Allegedly used by sex workers but in general used as timers.</li>
-                    <li>I've also read about <strong><a href="https://en.wikipedia.org/wiki/Knocker-up" target="_blank" rel="noopener noreferrer">Knocker-Uppers</a></strong>, who were employed to wake people up by tapping on their windows with a long stick or a pea shooter.</li>
-                    <li>The idea that non-military people cared little about time at night is not absolute, especially in Elizabethan time, when "<em>night-time slumber was divided into ‘first’ and ‘second’ sleeps, separated by a time when people would wake up and take part in activities such as socializing, reading, or praying.</em>" (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10404514/#:~:text=For%20Elizabethans%2C%20night%2Dtime%20slumber,socializing%2C%20reading%2C%20or%20praying." target="_blank" rel="noopener noreferrer">source</a>)</li>
+                    <li>I have heard about so called 'Brothel Candles' or <strong>'Pocket Candles'</strong>, which
+                        burned for 7 minutes more or less precisely. Allegedly used by sex workers but in general used
+                        as timers.</li>
+                    <li>I've also read about <strong><a href="https://en.wikipedia.org/wiki/Knocker-up" target="_blank"
+                                rel="noopener noreferrer">Knocker-Uppers</a></strong>, who were employed to wake people
+                        up by tapping on their windows with a long stick or a pea shooter.</li>
+                    <li>The idea that non-military people cared little about time at night is not absolute, especially
+                        in Elizabethan time, when "<em>night-time slumber was divided into ‘first’ and ‘second’ sleeps,
+                            separated by a time when people would wake up and take part in activities such as
+                            socializing, reading, or praying.</em>" (<a
+                            href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10404514/#:~:text=For%20Elizabethans%2C%20night%2Dtime%20slumber,socializing%2C%20reading%2C%20or%20praying."
+                            target="_blank" rel="noopener noreferrer">source</a>)</li>
                 </ul>
             </div>
         </div>
@@ -154,4 +255,5 @@ void loop() {
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
     <script>hljs.highlightAll();</script>
 </body>
+
 </html>
