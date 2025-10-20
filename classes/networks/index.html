@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Understanding Networks • Nasif's ITP Blog</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/p5.min.js" defer></script>
@@ -7,15 +8,18 @@
     <!-- <script type="text/javascript" src="https://rawgit.com/patriciogonzalezvivo/glslCanvas/master/dist/GlslCanvas.js"></script> -->
     <link rel="stylesheet" type="text/css" href="../../style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
-    <link href="https://fonts.googleapis.com/css2?family=Recursive:wght,CRSV,MONO@300..1000,0,0..1&family=Noto+Color+Emoji&display=block" rel="stylesheet"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Recursive:wght,CRSV,MONO@300..1000,0,0..1&family=Noto+Color+Emoji&display=block"
+        rel="stylesheet">
     <meta name="description" content="Nasif's experience at the ITP Understanding Networks course.">
     <meta name=”robots” content=”index, follow”>
     <link rel="icon" type="image/png" href="../../favicon.png">
     <meta name="theme-color" content="#ffffff">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8" />
-</head>    
+</head>
+
 <body>
     <main class="page-container course-container">
         <hgroup>
@@ -23,63 +27,165 @@
             <h1 class="project-title">Understanding Networks</h1>
         </hgroup>
         <div class="text-content">
+            <div class="blog-week" id="week-7">
+                <h2 class="project-subtitle"><u>Week 07</u> Setting up a static web server</h2>
+                <p>In the past, I have worked a lot with front end development but rarely have I had to setup a web server from scratch with nginx or apache. Reading Niko's blog on caddy made me want to give it a shot, so I went to the <a href="https://caddyserver.com/docs/install#debian-ubuntu-raspbian" target="_blank" rel="noopener noreferrer">official installation guide</a>.</p>
+                <p>While I could use <code>homebrew</code> to easily install it, the official way to do it is using <code>apt</code>, which is nice because then I can keep it in the same package manager as I'm keeping everything else. The instructions on the caddy side were kind of opaque, so I wrote a short explainer for my future reference:</p>
+                <h3 class="section-subheading">Setting up Caddy</h3>
+                <p>Before starting, make sure your firewall ufw is set to allow connections on http (port 80) and https (port 443).</p>
+                <p>Caddy is not part of the <code>apt</code> repos that are checked when you run apt-get, therefore we first need to add caddy's repo to the system's sources, so when we install it, it knows where to look for it. To do so, we have to start with some setup:</p>
+                <p>
+                    <pre><code class="language-shell">$ sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl</code></pre>
+                </p>
+                <p>This line installs a few dependencies:</p>
+                <ul>
+                    <li><strong>debian-keyring and debian-archive-keyring:</strong> these update your system's set of cryptographic keys. The point of these is so that, when running apt, they are used to confirm the package being installed is authentic and unmodified (based on the keys).</li>
+                    <li><strong>apt-transport-https:</strong> allows apt to get packages over https, which is included in modern ubuntu systems but it doesn't hurt to check</li>
+                    <li><strong>curl:</strong> used to make network requests. Also probably already installed.</li>
+                </ul>
+                <p>After this setup, we run</p>
+                <p>
+                    <pre><code class="language-shell">$ curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg</code></pre>
+                </p>
+                <p>This requests for caddy's GPG package key, used to confirm it is authentic. It is done with flags '1'(force https), 's' (silent, the opposite of verbose) , 'L' (follow redirects to reach the key in its current url) and 'f' (fail silently on HTTP errors like 4xx/5xx). The data is piped to the gpg tool, using flag 'dearmor' to convert the key into a binary file with extension .gpg as apt likes it. This gpg file is saved then in the <code>/usr/share/keyrings/</code> path.</p>
+                <p>
+                    <pre><code class="language-shell">$ curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list</code></pre>
+                </p>
+                <p>This gets Caddy's APT repository definition text, which contains the urls where your system should get any caddy repo it needs, plus information on which keys to trust. The curl uses the same flags as the last request but now we pipe to tee, which takes the information coming from the request as a text stream and saves it into a .list file as apt likes it.</p>
+                <p>Now we need to set permissions for those files we have created</p>
+                <p>
+                    <pre>
+<code class="language-shell">$ sudo chmod o+r /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+$ sudo chmod o+r /etc/apt/sources.list.d/caddy-stable.list</code></pre>
+                </p>
+                <p>Chmod is used to set permissions on the files. o+r means 'others' (not the owner of the file) have read permission. This way apt can always access the information in these files</p>
+                <p>Now we are ready to install caddy, let's do</p>
+                <p>
+                    <pre><code class="language-shell">$ sudo apt update
+$ sudo apt install caddy
+</code></pre>
+                </p>
+                <p>As soon as it's done, caddy will start running. You can see for yourself by requesting your ip on a browser! This will also persist across system reboots.</p>
+                <p>After this, you may follow the instructions that caddy shows on your site. If you do, the server will host files directly from the <code>/var/www/html/</code> path. You can use an ftp client like <strong>cyberduck</strong> to connect through SFTP (make sure you set up ufw to allow connections on port 22) using your same ssh keys and upload files to said path.</p>
+                <h3 class="section-subheading">What to do with the server</h3>
+                <p>For now, I routed the subdomain <strong>pipes.nasif.co</strong> to my server on digital ocean and added a sketch I made for the time course: a clock that shows you the solar time on your exact longitude, which is not always aligned to the time in your time zone.</p>
+                <p>As we move forward, I'd like to turn the server into a WebRTC Signaling Server, so I can create projects that communicate with each other peer-to-peer through webrtc. That's why I called it 'pipes'. I believe this sort of communication may be the fastest way to make two client devices talk to each other.</p>
+            </div>
             <div class="blog-week" id="week-4">
-                <h2 class="project-subtitle"><u>Week 04</u> Readings on 325 Hudson, Colocation Facilities, Fiber Optics and a look at Submarine Cables</h2>
+                <h2 class="project-subtitle"><u>Week 04</u> Readings on 325 Hudson, Colocation Facilities, Fiber Optics
+                    and a look at Submarine Cables</h2>
                 <h3 class="section-subheading">Notes on Submarine Cables</h3>
                 <ul>
-                    <li>Looking at the cables in South America, a particular one caught my attention: a cable going through the Amazon river, almost all the way in.</li>
-                    <li>This cable is called "Infovia 00", a 705km optical cable in the bed of the amazon river installed in 2022.</li>
-                    <li>According to <a href="https://www.inthefieldstories.net/optical-cable-is-laid-in-the-bed-of-the-amazon-river" target="_blank" rel="noopener noreferrer">this article</a>, it is part of an upcoming network of 8 riverbed cables that will connect people in the area to high speed internet.</li>
-                    <li>From the Colombian side, Infovía 02 was connected on July 1st 2024 from Tabatinga, BR to Leticia, the capital of the Amazon state in Colombia, according to <a href="https://www.bnamericas.com/es/noticias/cable-de-fibra-de-estado-brasileno-de-amazonas-llega-a-colombia" target="_blank" rel="noopener noreferrer">bnamericas</a>.</li>
-                    <li>This is amazing news since the Amazon state has long been a very hard to reach "last mile" for many different services, due to the terrain complexities (and special conservation care) or the Amazon rainforest. With this cable, about 10,000 homes will have access to high-speed internet.</li>
+                    <li>Looking at the cables in South America, a particular one caught my attention: a cable going
+                        through the Amazon river, almost all the way in.</li>
+                    <li>This cable is called "Infovia 00", a 705km optical cable in the bed of the amazon river
+                        installed in 2022.</li>
+                    <li>According to <a
+                            href="https://www.inthefieldstories.net/optical-cable-is-laid-in-the-bed-of-the-amazon-river"
+                            target="_blank" rel="noopener noreferrer">this article</a>, it is part of an upcoming
+                        network of 8 riverbed cables that will connect people in the area to high speed internet.</li>
+                    <li>From the Colombian side, Infovía 02 was connected on July 1st 2024 from Tabatinga, BR to
+                        Leticia, the capital of the Amazon state in Colombia, according to <a
+                            href="https://www.bnamericas.com/es/noticias/cable-de-fibra-de-estado-brasileno-de-amazonas-llega-a-colombia"
+                            target="_blank" rel="noopener noreferrer">bnamericas</a>.</li>
+                    <li>This is amazing news since the Amazon state has long been a very hard to reach "last mile" for
+                        many different services, due to the terrain complexities (and special conservation care) or the
+                        Amazon rainforest. With this cable, about 10,000 homes will have access to high-speed internet.
+                    </li>
                 </ul>
                 <h3 class="section-subheading">Notes on Colocation Facilities</h3>
                 <ul>
-                    <li>The fact that AS connected to the same access switch on the IXP can communicate "locally" is very interesting. It extends the idea of what 'local' means in terms of networks. Normally I associated this with a network running of the same router (or routers and repeaters connected together sharing the same SSID), but now local could be considered all of the networks connected to the same switch. <a href="https://www.cloudflare.com/learning/cdn/glossary/internet-exchange-point-ixp/" target="_blank" rel="noopener noreferrer">Cloudflare's article on the subject</a> takes it even further saying "An IXP is no different in basic concept to a home network, with the only real difference being scale"</li>
+                    <li>The fact that AS connected to the same access switch on the IXP can communicate "locally" is
+                        very interesting. It extends the idea of what 'local' means in terms of networks. Normally I
+                        associated this with a network running of the same router (or routers and repeaters connected
+                        together sharing the same SSID), but now local could be considered all of the networks connected
+                        to the same switch. <a
+                            href="https://www.cloudflare.com/learning/cdn/glossary/internet-exchange-point-ixp/"
+                            target="_blank" rel="noopener noreferrer">Cloudflare's article on the subject</a> takes it
+                        even further saying "An IXP is no different in basic concept to a home network, with the only
+                        real difference being scale"</li>
                 </ul>
                 <h3 class="section-subheading">Notes on Fiber Optics</h3>
                 <ul>
-                    <li>Back in Bogotá, everytime I moved and had ETB (the city's public ISP) connect my apartment to the internet, they would always leave a long cable wrapped in a wide loop connecting the modem to the wall. The technician strongly cautioned me that this was an extremely fragile fiber optic cable owned by ETB and I would have to pay a fee to if I didn't return it with the end of my service. <a href="https://articulo.mercadolibre.com.co/MCO-1523840369-cable-fibra-optica-internet-etb-movistar-claro-15m-monomodo-_JM" target="_blank" rel="noopener noreferrer">This is the cable on an online marketplace in Colombia</a>, selling for ~$19.50. </li>
+                    <li>Back in Bogotá, everytime I moved and had ETB (the city's public ISP) connect my apartment to
+                        the internet, they would always leave a long cable wrapped in a wide loop connecting the modem
+                        to the wall. The technician strongly cautioned me that this was an extremely fragile fiber optic
+                        cable owned by ETB and I would have to pay a fee to if I didn't return it with the end of my
+                        service. <a
+                            href="https://articulo.mercadolibre.com.co/MCO-1523840369-cable-fibra-optica-internet-etb-movistar-claro-15m-monomodo-_JM"
+                            target="_blank" rel="noopener noreferrer">This is the cable on an online marketplace in
+                            Colombia</a>, selling for ~$19.50. </li>
                 </ul>
                 <h3 class="section-subheading">Notes on 325 Hudson Carrier Hotel</h3>
                 <ul>
-                    <li>It is surreal to think about how we can send light across these long distances through pipes.</li>
-                    <li>I wonder what the batteries in power rooms A and B are for. I imagine they would be a backup in the case of an outage, but I'm not sure if there would be other reasons to keep these batteries.</li>
+                    <li>It is surreal to think about how we can send light across these long distances through pipes.
+                    </li>
+                    <li>I wonder what the batteries in power rooms A and B are for. I imagine they would be a backup in
+                        the case of an outage, but I'm not sure if there would be other reasons to keep these batteries.
+                    </li>
                 </ul>
             </div>
             <div class="blog-week" id="week-3">
-                <h2 class="project-subtitle"><u>Week 03</u> Readings on Internet Governance, DNS and Internet as Public Utility</h2>
+                <h2 class="project-subtitle"><u>Week 03</u> Readings on Internet Governance, DNS and Internet as Public
+                    Utility</h2>
                 <h3 class="section-subheading">Notes on Bodies of Governance and DNS</h3>
                 <ul>
-                    <li>It feels unusual to see how the whole world comes together in groups to manage and govern the internet, outside of a political context like the UN. It is probably not the only instance of this.</li>
-                    <li>It's interesting to see how, because of an original limitation in the initial design of the UDP packets for DNS architecture, we can only have 13 root DNS servers. Also how using anycast has allowed multiple servers to share the same IP address, effectively overcoming some of the limitations.</li>
-                    <li>It's not very clear to me how the DNS resolver and the root server relate to each other and why we need the resolver to begin with. In my mind, the root server could go a step farther and not only resolve the TLD but also the rest of the domain?</li>
-                    <li>I find it interesting that so many proposals for TLDs have been done, and the fact that they have been approved. While I can understand how difficult (and problematic) it could be to argue why <strong>not</strong> to accept a particular proposal, I wonder what benefits it really brings to have this many.</li>
+                    <li>It feels unusual to see how the whole world comes together in groups to manage and govern the
+                        internet, outside of a political context like the UN. It is probably not the only instance of
+                        this.</li>
+                    <li>It's interesting to see how, because of an original limitation in the initial design of the UDP
+                        packets for DNS architecture, we can only have 13 root DNS servers. Also how using anycast has
+                        allowed multiple servers to share the same IP address, effectively overcoming some of the
+                        limitations.</li>
+                    <li>It's not very clear to me how the DNS resolver and the root server relate to each other and why
+                        we need the resolver to begin with. In my mind, the root server could go a step farther and not
+                        only resolve the TLD but also the rest of the domain?</li>
+                    <li>I find it interesting that so many proposals for TLDs have been done, and the fact that they
+                        have been approved. While I can understand how difficult (and problematic) it could be to argue
+                        why <strong>not</strong> to accept a particular proposal, I wonder what benefits it really
+                        brings to have this many.</li>
                 </ul>
                 <h3 class="section-subheading">Notes on The Internet as a Public Utility</h3>
                 <ul>
-                    <li>Reading on how costs relate to the use of the infrastructure to connect to the internet, I remember last week's reading by Paul Baran. In a section, he mentioned how routes are optimized to do the least hops possible to the destination, but also offered an alternative that could instead prioritize the cheapest route. I wonder if there are current cases of this implementation.</li>
-                    <li>Atleast for the last two decades, there has been debate about whether to privatize Bogotá's public internet service provider ETB. Yearly deficits have led the company to be unable to fulfill scheduled updates to its infrastructure and some proponents argue that privatization could inject funds for this plus generate an additional revenue for the city. However, it is also clear that private interests might not prioritize the "last mile" expansions that public plans do. I wonder what differences there are with the case of Chattanooga.</li>
+                    <li>Reading on how costs relate to the use of the infrastructure to connect to the internet, I
+                        remember last week's reading by Paul Baran. In a section, he mentioned how routes are optimized
+                        to do the least hops possible to the destination, but also offered an alternative that could
+                        instead prioritize the cheapest route. I wonder if there are current cases of this
+                        implementation.</li>
+                    <li>Atleast for the last two decades, there has been debate about whether to privatize Bogotá's
+                        public internet service provider ETB. Yearly deficits have led the company to be unable to
+                        fulfill scheduled updates to its infrastructure and some proponents argue that privatization
+                        could inject funds for this plus generate an additional revenue for the city. However, it is
+                        also clear that private interests might not prioritize the "last mile" expansions that public
+                        plans do. I wonder what differences there are with the case of Chattanooga.</li>
                 </ul>
             </div>
             <div class="blog-week" id="week-2">
                 <h2 class="project-subtitle"><u>Week 02</u> Traceroute and Network Mapping</h2>
                 <h3 class="section-subheading">Tracerouting to a Phone on IPV6</h3>
-                <p>Reading the prompt, I became intrigued by the idea of tracerouting to my phones IP (given my phone is connected to cellular data). I got my phone's public address from <a href="http://ip2location.com" target="_blank" rel="noopener noreferrer">ip2location.com</a>, which interestingly only gave me an IPV6 address.</p>
+                <p>Reading the prompt, I became intrigued by the idea of tracerouting to my phones IP (given my phone is
+                    connected to cellular data). I got my phone's public address from <a href="http://ip2location.com"
+                        target="_blank" rel="noopener noreferrer">ip2location.com</a>, which interestingly only gave me
+                    an IPV6 address.</p>
                 <p>I found the <code>traceroute6</code> command and gave it a try but immediately got:</p>
                 <pre>
-<code class="console">connect: No route to host</code>
-                </pre>
-                <p>Reading more on it, and seeing the same result when running <code>traceroute6 google.com</code>, I came to the conclusion that my ISP does not have IPV6 support on for my home network.</p>
-                <p>So I tried instead to use my phones IPV4, and got up to 13 hops before getting into private hosts without response:</p>
+<code class="console">connect: No route to host</code></pre>
+                <p>Reading more on it, and seeing the same result when running <code>traceroute6 google.com</code>, I
+                    came to the conclusion that my ISP does not have IPV6 support on for my home network.</p>
+                <p>So I tried instead to use my phones IPV4, and got up to 13 hops before getting into private hosts
+                    without response:</p>
                 <div class="image-slide">
                     <figure>
-                        <img src="https://assets.nasif.co/traceroute-phone.webp" alt="Map connecting lines inside of New York City and to Boston.">
-                        <figcaption>The traceroute did a few hops around NYC before jumping to Boston and then not reporting back anymore.</figcaption>
+                        <img src="https://assets.nasif.co/traceroute-phone.webp"
+                            alt="Map connecting lines inside of New York City and to Boston.">
+                        <figcaption>The traceroute did a few hops around NYC before jumping to Boston and then not
+                            reporting back anymore.</figcaption>
                     </figure>
                 </div>
                 <h3 class="section-subheading">Identifying Autonomous Systems</h3>
-                <p>After this, I attempted to traceroute to some sites I frequent. Very quickly I realized that almost every single time I would get timeouts on hops. So I decided to instead focus on the AS numbers and trying to identify what Autonomous Systems I pass through often.</p>
+                <p>After this, I attempted to traceroute to some sites I frequent. Very quickly I realized that almost
+                    every single time I would get timeouts on hops. So I decided to instead focus on the AS numbers and
+                    trying to identify what Autonomous Systems I pass through often.</p>
                 <p>I used <code>traceroute -a host | grep -o '\[AS[0-9]\+\]'</code> for the following sites:</p>
                 <ul>
                     <li>google.com</li>
@@ -100,67 +206,109 @@
 [AS3356]	3	Level 3 Parent, LLC
 [AS32934]	3	Facebook
 [AS6461]	1	Zayo Bandwidth
-[AS5773]	1	BCN Telecom Inc
-                </pre>
-                <p>Its no surprise that spectrum is the main Autonomous System I pass through since they are my ISP. The rest of them are also not very unusual, but I would need to make a larger amount of traceroutes to get a better picture of my common networking routes.</p>
+[AS5773]	1	BCN Telecom Inc</pre>
+                <p>Its no surprise that spectrum is the main Autonomous System I pass through since they are my ISP. The
+                    rest of them are also not very unusual, but I would need to make a larger amount of traceroutes to
+                    get a better picture of my common networking routes.</p>
                 <h3 class="section-subheading">Cloudflare's AI Labyrinth</h3>
-                <p>Last week in class I mentioned having read about cloudflare intentionally trapping AI scrapers into a loop of hops and redirects. I looked into it again, reading <a href="https://blog.cloudflare.com/ai-labyrinth/" target="_blank" rel="noopener noreferrer">Cloudflare's blog post on the subject</a>.</p>
-                <p>How I explained it was not entirely accurate. The way it is explained in the linked article says that bots are sent into AI generated web pages that have internal links to more AI generated pages, essentially making them crawl sites that are not a real part of the visited site. In doing so, they waste their resources and time. Cloudflare also uses this a specialized tool to identify aggressive AI crawlers, which are the ones that will go deeper into the labyrinth.</p>
+                <p>Last week in class I mentioned having read about cloudflare intentionally trapping AI scrapers into a
+                    loop of hops and redirects. I looked into it again, reading <a
+                        href="https://blog.cloudflare.com/ai-labyrinth/" target="_blank"
+                        rel="noopener noreferrer">Cloudflare's blog post on the subject</a>.</p>
+                <p>How I explained it was not entirely accurate. The way it is explained in the linked article says that
+                    bots are sent into AI generated web pages that have internal links to more AI generated pages,
+                    essentially making them crawl sites that are not a real part of the visited site. In doing so, they
+                    waste their resources and time. Cloudflare also uses this a specialized tool to identify aggressive
+                    AI crawlers, which are the ones that will go deeper into the labyrinth.</p>
             </div>
             <div class="blog-week" id="week-1">
                 <h2 class="project-subtitle"><u>Week 01</u> Setting up a host, firewall and readings</h2>
                 <h3 class="section-subheading">Droplet and Server</h3>
-                <p>After being put on an activation hold by Digital Ocean for a day, everything went smoothly. I configured the server with an ssh key but later realized that, since that key was for the <code>root</code> user, and I preferred not reusing it, I'd have to make a new key.</p>
-                <p>So I followed <a href="https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server">digital ocean's ssh key guide</a> and created a new one, saving the passphrase to my keychain and setting up my <code>.ssh/config</code> file nicely:</p>
+                <p>After being put on an activation hold by Digital Ocean for a day, everything went smoothly. I
+                    configured the server with an ssh key but later realized that, since that key was for the
+                    <code>root</code> user, and I preferred not reusing it, I'd have to make a new key.
+                </p>
+                <p>So I followed <a
+                        href="https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server">digital
+                        ocean's ssh key guide</a> and created a new one, saving the passphrase to my keychain and
+                    setting up my <code>.ssh/config</code> file nicely:</p>
                 <pre>
 <code class="console">Host uplink
     HostName &lt;server public IP&gt;
     User &lt;username&gt;
     IdentityFile &lt;path to private key&gt;
     AddKeysToAgent yes
-    UseKeychain yes
-</code>
-                </pre>
+    UseKeychain yes</code></pre>
                 <p> so I only have to type:</p>
-                <pre>
-<code class="console">$ssh uplink</code>
-                </pre>
-                <p>To log into my server. This took longer than I had planned but felt very nice to have a clean setup.</p>
-                <p>I then had to briefly stop working on the server and forgot to power it off. When I came back a couple of hours later I setup the firewall and in a few minutes It had already blocked 64 connections. I wonder what could have been happening in that time the server was running without a firewall.</p>
+                <pre><code class="console">$ssh uplink</code></pre>
+                <p>To log into my server. This took longer than I had planned but felt very nice to have a clean setup.
+                </p>
+                <p>I then had to briefly stop working on the server and forgot to power it off. When I came back a
+                    couple of hours later I setup the firewall and in a few minutes It had already blocked 64
+                    connections. I wonder what could have been happening in that time the server was running without a
+                    firewall.</p>
                 <p>Currently running the server for a few days before I do the firewall analysis</p>
                 <h3 class="section-subheading">Firewall Log Analysis</h3>
-                <p>After running the server for a couple of days, I passed the logs to an excel sheet for analysis. Replacing spaces with tabs didn't work well for me when passing it to excel, so I instead replaced them with commas and used excel's text-to-columns feature.</p>
+                <p>After running the server for a couple of days, I passed the logs to an excel sheet for analysis.
+                    Replacing spaces with tabs didn't work well for me when passing it to excel, so I instead replaced
+                    them with commas and used excel's text-to-columns feature.</p>
                 <ul>
                     <li><strong>Blocked Connections:</strong> 3849</li>
                     <li><strong>Number of Unique IPs:</strong> 2116</li>
                     <li><strong>Most attempts from one IP:</strong> 54 attempts</li>
                     <li><strong>Location of said IP:</strong> Ashburn, VA Amazon Data Services Northern Virginia</li>
                 </ul>
-                <p>Since its been visiting my IP so much, I decided to visit theirs. Curiously, it served a directory list.</p>
+                <p>Since its been visiting my IP so much, I decided to visit theirs. Curiously, it served a directory
+                    list.</p>
                 <p>I opened each file. Turns out that one file contains a bunch of entries with the format:</p>
                 <pre>
-Discovered open port 5900/tcp on X.X.X.X   
-                </pre>
-                <p>So it seems this is some sort of scanner, discovering IP addresses where port 5900 is open. I looked it up and <strong>this is the port used by VNC</strong>. I've used VNC before to connect to a raspberry pi, so I imagine all of these IP addresses are allowing connections to remote control of a graphical desktop interface. Looking up the IP in AbuseIPDB said it has 16% confidence that it is an abusive host.</p>
-                <p>This made me worry a bit more about the short time my server was running without a firewall, so I looked it up and found you can check the authentication logs to see successful logins. I used <code>grep</code> to only see lines with successful logins and everything made sense with when I have logged in.</p>
+Discovered open port 5900/tcp on X.X.X.X</pre>
+                <p>So it seems this is some sort of scanner, discovering IP addresses where port 5900 is open. I looked
+                    it up and <strong>this is the port used by VNC</strong>. I've used VNC before to connect to a
+                    raspberry pi, so I imagine all of these IP addresses are allowing connections to remote control of a
+                    graphical desktop interface. Looking up the IP in AbuseIPDB said it has 16% confidence that it is an
+                    abusive host.</p>
+                <p>This made me worry a bit more about the short time my server was running without a firewall, so I
+                    looked it up and found you can check the authentication logs to see successful logins. I used
+                    <code>grep</code> to only see lines with successful logins and everything made sense with when I
+                    have logged in.
+                </p>
                 <h3 class="section-subheading">Notes on Deb Chachra's <em>How Infrastructure Shapes Us</em></h3>
                 <ul>
-                    <li>Chachra's argument on how infrastructure, something 'invisible'/taken for granted, deeply shape our lives resonates strongly with a lot of Georges Perec's philosophy of the infraordinary. I especially enjoy his text <a href="https://summitsguide.wordpress.com/wp-content/uploads/2014/10/approaches-to-what.pdf" target="_blank" rel="noopener noreferrer">Approaches to What?</a>, an invitation to look closely at the overlooked.</li>
-                    <li>Moving to NYC and away from the systems I'm accustomed to in Colombia has made it at times easy to identify the differences in infrastructure that shape our experience:</li>
+                    <li>Chachra's argument on how infrastructure, something 'invisible'/taken for granted, deeply shape
+                        our lives resonates strongly with a lot of Georges Perec's philosophy of the infraordinary. I
+                        especially enjoy his text <a
+                            href="https://summitsguide.wordpress.com/wp-content/uploads/2014/10/approaches-to-what.pdf"
+                            target="_blank" rel="noopener noreferrer">Approaches to What?</a>, an invitation to look
+                        closely at the overlooked.</li>
+                    <li>Moving to NYC and away from the systems I'm accustomed to in Colombia has made it at times easy
+                        to identify the differences in infrastructure that shape our experience:</li>
                     <ul>
-                        <li>Surge pricing on electricity: seasons mean energy usage varies across the year. So the required size of the grid is unclear, it is strained in the winter and underused in the summer.</li>
-                        <li>Lack of water meters: water tends to be included in rent. Individual water usage is not tracked and not charged. In some cases there is little deterrence from irresponsible consumption and waste.</li>
-                        <li>Same with hot water. Heating is done in the scope of the building. In Colombia, water heating is done through each apartment's water heater.</li>
+                        <li>Surge pricing on electricity: seasons mean energy usage varies across the year. So the
+                            required size of the grid is unclear, it is strained in the winter and underused in the
+                            summer.</li>
+                        <li>Lack of water meters: water tends to be included in rent. Individual water usage is not
+                            tracked and not charged. In some cases there is little deterrence from irresponsible
+                            consumption and waste.</li>
+                        <li>Same with hot water. Heating is done in the scope of the building. In Colombia, water
+                            heating is done through each apartment's water heater.</li>
                     </ul>
                 </ul>
-                <h3 class="section-subheading">Notes on <em>Why Google Went Offline Today and a Bit about How the Internet Works</em></h3>
+                <h3 class="section-subheading">Notes on <em>Why Google Went Offline Today and a Bit about How the
+                        Internet Works</em></h3>
                 <ul>
-                    <li>I had no idea about the Border Gateway Protocol (BGP), and Autonomous Systems (AS) numbers. I knew how the internet was a network of networks but didn't have a very clear image of how these get connected.</li>
+                    <li>I had no idea about the Border Gateway Protocol (BGP), and Autonomous Systems (AS) numbers. I
+                        knew how the internet was a network of networks but didn't have a very clear image of how these
+                        get connected.</li>
                     <li>Would love to know more about where in this whole process DNS fits in with regards to BGP.</li>
                 </ul>
-                <h3 class="section-subheading"> Notes on <em>We finally know what caused the global tech outage – and how much it cost</em></h3>
+                <h3 class="section-subheading"> Notes on <em>We finally know what caused the global tech outage – and
+                        how much it cost</em></h3>
                 <ul>
-                    <li>It's intriguing to see how software can also be infrastructure, and how certain software infrastructures operate at a global level while being maintained by a single company. I assume, mostly due to lack of alternative softwares in niche markets and user reluctance to upgrade/migrate.</li>
+                    <li>It's intriguing to see how software can also be infrastructure, and how certain software
+                        infrastructures operate at a global level while being maintained by a single company. I assume,
+                        mostly due to lack of alternative softwares in niche markets and user reluctance to
+                        upgrade/migrate.</li>
                 </ul>
             </div>
         </div>
@@ -169,4 +317,5 @@ Discovered open port 5900/tcp on X.X.X.X
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
     <script>hljs.highlightAll();</script>
 </body>
+
 </html>

@@ -148,7 +148,7 @@ p, li {
 
 p, li {
     font-variation-settings: "MONO" 0, "CASL" 0, "slnt" 0, "CRSV" 0;
-    line-height: 1.25em;
+    line-height: 1.35em;
 }
 
 p strong {
@@ -545,6 +545,11 @@ a[href]:not([href=""])[download]{
     max-width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    border: 1px solid lightgray;
+    padding: 0.5em;
+    border-radius: 0.5em;
 }
 
 .text-content pre code {
