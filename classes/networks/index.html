@@ -27,72 +27,492 @@
             <h1 class="project-title">Understanding Networks</h1>
         </hgroup>
         <div class="text-content">
-            <div class="blog-week" id="week-8">
-                <h2 class="project-subtitle"><u>Week 08</u> ESP32CAM as an IP Camera</h2>
-                <p>For this assignment on connecting a microcontroller to the network, I decided to give the ESP32-CAM module a try since I've been planning some projects using live webcams/IP cameras.</p>
+            <div class="blog-week" id="week-10">
+                <h2 class="project-subtitle"><u>Week 10</u> Launching an API</h2>
+                <p>For my API, I decided to keep working with the ESP32CAM. I modified some <a
+                        href="https://randomnerdtutorials.com/esp32-cam-post-image-photo-server/" target="_blank"
+                        rel="noopener noreferrer">code from random nerd tutorials</a> that makes the the module do a
+                    POST request to a server with the captured image on an interval of time. After some testing, I
+                    decided to add an API key for it, so that only clients with said key can actually post to my server.
+                </p>
+                <details>
+                    <summary>View Arduino Code:</summary>
+                    <pre><code class="language-cpp">#include &lt;Arduino.h&gt;
+#include &lt;WiFi.h&gt;
+#include &lt;WiFiClientSecure.h&gt;
+#include "soc/soc.h"
+#include "soc/rtc_cntl_reg.h"
+#include "esp_camera.h"
+
+const char* ssid = "YOUR SSID HERE";
+const char* password = "YOUR PASSWORD HERE";
+
+String serverName = "yourseverhost.com";
+String serverPath = "/the/path/to/your/api/endpoint";
+const int serverPort = 443; // HTTPS
+
+WiFiClientSecure client;
+
+// CAMERA_MODEL_AI_THINKER
+#define PWDN_GPIO_NUM     32
+#define RESET_GPIO_NUM    -1
+#define XCLK_GPIO_NUM      0
+#define SIOD_GPIO_NUM     26
+#define SIOC_GPIO_NUM     27
+
+#define Y9_GPIO_NUM       35
+#define Y8_GPIO_NUM       34
+#define Y7_GPIO_NUM       39
+#define Y6_GPIO_NUM       36
+#define Y5_GPIO_NUM       21
+#define Y4_GPIO_NUM       19
+#define Y3_GPIO_NUM       18
+#define Y2_GPIO_NUM        5
+#define VSYNC_GPIO_NUM    25
+#define HREF_GPIO_NUM     23
+#define PCLK_GPIO_NUM     22
+
+const int timerInterval = 15000;    // time between each HTTP POST image
+unsigned long previousMillis = 0;   // last time image was sent
+
+void setup() {
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); 
+  Serial.begin(115200);
+
+  WiFi.mode(WIFI_STA);
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+  WiFi.begin(ssid, password);  
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(500);
+  }
+  Serial.println();
+  Serial.print("ESP32-CAM IP Address: ");
+  Serial.println(WiFi.localIP());
+
+  camera_config_t config;
+  config.ledc_channel = LEDC_CHANNEL_0;
+  config.ledc_timer = LEDC_TIMER_0;
+  config.pin_d0 = Y2_GPIO_NUM;
+  config.pin_d1 = Y3_GPIO_NUM;
+  config.pin_d2 = Y4_GPIO_NUM;
+  config.pin_d3 = Y5_GPIO_NUM;
+  config.pin_d4 = Y6_GPIO_NUM;
+  config.pin_d5 = Y7_GPIO_NUM;
+  config.pin_d6 = Y8_GPIO_NUM;
+  config.pin_d7 = Y9_GPIO_NUM;
+  config.pin_xclk = XCLK_GPIO_NUM;
+  config.pin_pclk = PCLK_GPIO_NUM;
+  config.pin_vsync = VSYNC_GPIO_NUM;
+  config.pin_href = HREF_GPIO_NUM;
+  config.pin_sccb_sda = SIOD_GPIO_NUM;
+  config.pin_sccb_scl = SIOC_GPIO_NUM;
+  config.pin_pwdn = PWDN_GPIO_NUM;
+  config.pin_reset = RESET_GPIO_NUM;
+  config.xclk_freq_hz = 20000000;
+  config.pixel_format = PIXFORMAT_JPEG;
+
+  // init with high specs to pre-allocate larger buffers
+  if(psramFound()){
+    config.frame_size = FRAMESIZE_SVGA;
+    config.jpeg_quality = 10;  //0-63 lower number means higher quality
+    config.fb_count = 2;
+  } else {
+    config.frame_size = FRAMESIZE_CIF;
+    config.jpeg_quality = 12;  //0-63 lower number means higher quality
+    config.fb_count = 1;
+  }
+  
+  // camera init
+  esp_err_t err = esp_camera_init(&config);
+  if (err != ESP_OK) {
+    Serial.printf("Camera init failed with error 0x%x", err);
+    delay(1000);
+    ESP.restart();
+  }
+
+  sendPhoto(); 
+}
+
+void loop() {
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis &gt;= timerInterval) {
+    sendPhoto();
+    previousMillis = currentMillis;
+  }
+}
+
+String sendPhoto() {
+  String getAll;
+  String getBody;
+
+  camera_fb_t * fb = NULL;
+  fb = esp_camera_fb_get();
+  if(!fb) {
+    Serial.println("Camera capture failed");
+    delay(1000);
+    ESP.restart();
+  }
+  
+  Serial.println("Connecting to server: " + serverName);
+  
+  client.setInsecure(); //skip certificate validation
+  if (client.connect(serverName.c_str(), serverPort)) {
+    Serial.println("Connection successful!");    
+    String head = "--ESP32CAM\r\nContent-Disposition: form-data; name=\"imageFile\"; filename=\"esp32-cam.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n";
+    String tail = "\r\n--ESP32CAM--\r\n";
+
+    uint32_t imageLen = fb-&gt;len;
+    uint32_t extraLen = head.length() + tail.length();
+    uint32_t totalLen = imageLen + extraLen;
+  
+    client.println("POST " + serverPath + " HTTP/1.1");
+    client.println("Host: " + serverName);
+    client.println("Content-Length: " + String(totalLen));
+    client.println("X-API-Key: YOUR API KEY HERE");
+    client.println("Content-Type: multipart/form-data; boundary=ESP32CAM");
+    client.println();
+    client.print(head);
+  
+    uint8_t *fbBuf = fb-&gt;buf;
+    size_t fbLen = fb-&gt;len;
+    for (size_t n=0; n&lt;fbLen; n=n+1024) {
+      if (n+1024 &lt; fbLen) {
+        client.write(fbBuf, 1024);
+        fbBuf += 1024;
+      }
+      else if (fbLen%1024&gt;0) {
+        size_t remainder = fbLen%1024;
+        client.write(fbBuf, remainder);
+      }
+    }   
+    client.print(tail);
+    
+    esp_camera_fb_return(fb);
+    
+    int timoutTimer = 10000;
+    long startTimer = millis();
+    boolean state = false;
+    
+    while ((startTimer + timoutTimer) &gt; millis()) {
+      Serial.print(".");
+      delay(100);      
+      while (client.available()) {
+        char c = client.read();
+        if (c == '\n') {
+          if (getAll.length()==0) { state=true; }
+          getAll = "";
+        }
+        else if (c != '\r') { getAll += String(c); }
+        if (state==true) { getBody += String(c); }
+        startTimer = millis();
+      }
+      if (getBody.length()&gt;0) { break; }
+    }
+    Serial.println();
+    client.stop();
+    Serial.println(getBody);
+  }
+  else {
+    getBody = "Connection to " + serverName +  " failed.";
+    Serial.println(getBody);
+  }
+  return getBody;
+}
+                    </code></pre>
+                </details>
+                <p>On the server side, I made a simple node app that would use express to listen on port 3005 to POST
+                    requests and GET requests. For POST, it checks the API key and then promptly saves the received
+                    image, ovewriting the last one. For GET requests, it sends back information about the picture (time
+                    it was uploaded and url to the image).</p>
+                <p>Once the code was ready, I used <code>scp</code> to copy it into my server. I wanted to give
+                    <code>systemd</code> a try so I followed some instructions and saved my code into the
+                    <code>/opt/</code> folder, which stands for <a
+                        href="https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch03s13.html" target="_blank"
+                        rel="noopener noreferrer">add on applications</a>. Once there, I made sure my user owned the
+                    file and then created a systemd <code>.service</code> file in
+                    <code>etc/systemd/systems/name.service</code>. The file looked like this:</p>
+                <pre><code class="language-ini">[Unit]
+Description=NAME OF APPLICATION
+After=network.target
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+WorkingDirectory=/opt/&lt;directory of your app&gt;
+ExecStart=/usr/bin/node /opt/&lt;directory of your app&gt;/index.js
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=identifier-for-your-app
+
+# Environment
+Environment=NODE_ENV=production
+Environment=PORT=&lt;port number of your app&gt;
+
+[Install]
+WantedBy=multi-user.target</code>
+                </pre>
+                <p>After saving the file, I ran:</p>
+                <pre><code class="language-shell">$sudo systemctl daemon-reload
+$sudo systemctl enable identifier-for-your-app
+$sudo systemctl start identifier-for-your-app</code></pre>
+                <p>This started my app with auto restart in case something failed.</p>
+                <details>
+                    <summary>View node.js code</summary>
+                    <pre><code class="language-js">const express = require('express');
+const fs = require('fs');
+const path = require('path');
+
+const app = express();
+const PORT = 3005;
+
+// Middleware to parse multipart form data
+app.use(express.raw({ type: 'multipart/form-data', limit: '10mb' }));
+
+// Store metadata about the last uploaded image
+let lastImageMetadata = {
+  timestamp: null,
+  uploadedAt: null
+};
+
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+
+const imagePath = path.join(uploadsDir, 'latest.jpg');
+
+const API_KEY = 'your-secret-key-here';
+
+// POST endpoint to receive images
+app.post('/shot', (req, res) => {
+  // Check API key
+  const providedKey = req.headers['x-api-key'];
+  if (providedKey !== API_KEY) {
+    console.log('Unauthorized access attempt');
+    return res.status(401).send('Unauthorized');
+  }
+  
+  try {
+    const boundary = req.headers['content-type'].split('boundary=')[1];
+    const bodyString = req.body.toString('binary');
+    
+    // Find the JPEG data between the boundary markers
+    const jpegStart = bodyString.indexOf('\r\n\r\n') + 4;
+    const jpegEnd = bodyString.indexOf('\r\n--' + boundary + '--');
+    
+    // Extract the JPEG binary data
+    const jpegData = Buffer.from(bodyString.substring(jpegStart, jpegEnd), 'binary');
+    
+    // Save the image (overwrites previous)
+    fs.writeFileSync(imagePath, jpegData);
+    
+    // Update metadata
+    const now = new Date();
+    lastImageMetadata = {
+      timestamp: now.toISOString(), // UTC timestamp
+      uploadedAt: now.toLocaleString('en-US', { timeZone: 'America/New_York' }) // NYC time
+    };
+    
+    console.log(`Image received and saved at ${lastImageMetadata.uploadedAt}`);
+    res.status(200).send('Image uploaded successfully');
+  } catch (error) {
+    console.error('Error processing image:', error);
+    res.status(500).send('Error processing image');
+  }
+});
+
+// GET endpoint to retrieve image info
+app.get('/photo', (req, res) => {
+  if (!fs.existsSync(imagePath)) {
+    return res.status(404).json({
+      error: 'No image available',
+      message: 'No image has been uploaded yet'
+    });
+  }
+  
+  // Check if image is older than 10 minutes
+  const now = new Date();
+  const lastUpdate = new Date(lastImageMetadata.timestamp);
+  const timeDiffMinutes = (now - lastUpdate) / (1000 * 60);
+  
+  if (timeDiffMinutes > 10) {
+    return res.status(503).json({
+      error: 'Camera offline',
+      message: 'Camera has not sent an image in over 10 minutes',
+      lastUpdate: lastImageMetadata.uploadedAt,
+      minutesAgo: Math.floor(timeDiffMinutes)
+    });
+  }
+  
+  const protocol = req.protocol;
+  const host = req.get('host');
+  const imageUrl = `${protocol}://${host}/camera/image`;
+  
+  res.json({
+    imageUrl: imageUrl,
+    timestamp: lastImageMetadata.timestamp,
+    uploadedAt: lastImageMetadata.uploadedAt,
+    message: 'Latest webcam image'
+  });
+});
+
+// Serve the actual image file
+app.get('/image', (req, res) => {
+  if (!fs.existsSync(imagePath)) {
+    return res.status(404).send('No image available');
+  }
+  
+  res.setHeader('Content-Type', 'image/jpeg');
+  res.sendFile(imagePath);
+});
+
+app.listen(PORT, () => {
+});</code></pre>
+                </details>
+                <p>This gave shape to an API with the following structure:</p>
+                <ul>
+                    <li><strong>Base URL:</strong> pipes.nasif.co/camera</li>
+                    <li><strong>/shot</strong> (POST): Internal use only, for posting images from the camera.</li>
+                    <li><strong>/photo</strong> (GET): Retrieve metadata about the latest image. This is a JSON response with the following schema: <pre><code class="laguage-json">{
+    "imageUrl": "url to the image",
+    "timestamp": "UTC time it was uploaded",
+    "uploadedAt": "MM/DD/YYYY, HH:MM:SS AM/PM in NYC timezone",
+    "message": "Latest webcam image"
+}</code></pre></li>
+                    <li><strong>/image</strong> (GET): Retrieve the latest image from the camera.</li>
+                </ul>
+                <p>Lastly, I created a reverse proxy using caddy so that the /camera path would lead to the 3005 portwhere my express app was running. With this going, I left the ESP32CAM connected and running, while facing the stack of books on my staging desk for now, until I find a good place to put it that won't intrude in anyone's privacy other than my own.</p>
                 <div class="image-slide">
                     <figure>
-                        <img src="https://content.instructables.com/FCE/U2OX/LOMX063A/FCEU2OXLOMX063A.jpg" alt="esp32-cam">
+                        <img src="https://pipes.nasif.co/camera/image">
+                        <figcaption>The latest image captured by the ESP32CAM. This is being served directly from the API. If the image is broken it may indicate the API is down.</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="blog-week" id="week-8">
+                <h2 class="project-subtitle"><u>Week 08</u> ESP32CAM as an IP Camera</h2>
+                <p>For this assignment on connecting a microcontroller to the network, I decided to give the ESP32-CAM
+                    module a try since I've been planning some projects using live webcams/IP cameras.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img src="https://content.instructables.com/FCE/U2OX/LOMX063A/FCEU2OXLOMX063A.jpg"
+                            alt="esp32-cam">
                         <figcaption>The module used</figcaption>
                     </figure>
                 </div>
-                <p>After reading online a bit about the module, I found that by setting my board in the arduino IDE as 'AI Thinker ESP32CAM', I had access to a bunch of examples for it. One of them was the <a href="https://github.com/espressif/arduino-esp32/tree/master/libraries/ESP32/examples/Camera/CameraWebServer" target="_blank" rel="noopener noreferrer">CameraWebServer</a>, which turned the module into an IP camera, printing the IP into the serial monitor on wifi connection.</p>
-                <p>At first I couldn't get it to recognize the camera. But reading online, this error seemed to be due to the camera being connected on a different pin than the code was using. So I went into the <code>board_config.h</code> tab to see which pins were in use and realized I needed to <code>#define CAMERA_MODEL_AI_THINKER</code> to use the right pins.</p>
+                <p>After reading online a bit about the module, I found that by setting my board in the arduino IDE as
+                    'AI Thinker ESP32CAM', I had access to a bunch of examples for it. One of them was the <a
+                        href="https://github.com/espressif/arduino-esp32/tree/master/libraries/ESP32/examples/Camera/CameraWebServer"
+                        target="_blank" rel="noopener noreferrer">CameraWebServer</a>, which turned the module into an
+                    IP camera, printing the IP into the serial monitor on wifi connection.</p>
+                <p>At first I couldn't get it to recognize the camera. But reading online, this error seemed to be due
+                    to the camera being connected on a different pin than the code was using. So I went into the
+                    <code>board_config.h</code> tab to see which pins were in use and realized I needed to
+                    <code>#define CAMERA_MODEL_AI_THINKER</code> to use the right pins.
+                </p>
                 <div class="image-slide">
                     <figure>
-                        <img src="https://assets.nasif.co/esp32camselfie.webp" alt="Interface of IP Camera on a web browser.">
-                        <figcaption>The camera streaming over the local network, with the flash on for better lighting.</figcaption>
+                        <img src="https://assets.nasif.co/esp32camselfie.webp"
+                            alt="Interface of IP Camera on a web browser.">
+                        <figcaption>The camera streaming over the local network, with the flash on for better lighting.
+                        </figcaption>
                     </figure>
                     <figure>
-                        <img src="https://assets.nasif.co/ov2640settings.webp" alt="Settings of an IP Camera on a web browser.">
-                        <figcaption>The settings given by the arduino sketch. These work through a REST server on the esp32, as can be seen on the buttons in the interface and the requests they make.</figcaption>
+                        <img src="https://assets.nasif.co/ov2640settings.webp"
+                            alt="Settings of an IP Camera on a web browser.">
+                        <figcaption>The settings given by the arduino sketch. These work through a REST server on the
+                            esp32, as can be seen on the buttons in the interface and the requests they make.
+                        </figcaption>
                     </figure>
                 </div>
-                <p>While streaming did work, it was somewhat shotty; skipping a lot of frames, stopping stream altogether. Some of these issues and fixes are documented in <a href="https://github.com/espressif/arduino-esp32/issues/4655#issuecomment-763287559" target="_blank" rel="noopener noreferrer">this gituhb issue</a>, and someone wrote a different <a href="https://github.com/techiesms/esp32-cam-mjpeg" target="_blank" rel="noopener noreferrer">firmware to stream using MJPEG</a> which is worth testing out.</p>
+                <p>While streaming did work, it was somewhat shotty; skipping a lot of frames, stopping stream
+                    altogether. Some of these issues and fixes are documented in <a
+                        href="https://github.com/espressif/arduino-esp32/issues/4655#issuecomment-763287559"
+                        target="_blank" rel="noopener noreferrer">this gituhb issue</a>, and someone wrote a different
+                    <a href="https://github.com/techiesms/esp32-cam-mjpeg" target="_blank"
+                        rel="noopener noreferrer">firmware to stream using MJPEG</a> which is worth testing out.
+                </p>
             </div>
             <div class="blog-week" id="week-7">
                 <h2 class="project-subtitle"><u>Week 07</u> Setting up a static web server</h2>
-                <p>In the past, I have worked a lot with front end development but rarely have I had to setup a web server from scratch with nginx or apache. Reading Niko's blog on caddy made me want to give it a shot, so I went to the <a href="https://caddyserver.com/docs/install#debian-ubuntu-raspbian" target="_blank" rel="noopener noreferrer">official installation guide</a>.</p>
-                <p>While I could use <code>homebrew</code> to easily install it, the official way to do it is using <code>apt</code>, which is nice because then I can keep it in the same package manager as I'm keeping everything else. The instructions on the caddy side were kind of opaque, so I wrote a short explainer for my future reference:</p>
+                <p>In the past, I have worked a lot with front end development but rarely have I had to setup a web
+                    server from scratch with nginx or apache. Reading Niko's blog on caddy made me want to give it a
+                    shot, so I went to the <a href="https://caddyserver.com/docs/install#debian-ubuntu-raspbian"
+                        target="_blank" rel="noopener noreferrer">official installation guide</a>.</p>
+                <p>While I could use <code>homebrew</code> to easily install it, the official way to do it is using
+                    <code>apt</code>, which is nice because then I can keep it in the same package manager as I'm
+                    keeping everything else. The instructions on the caddy side were kind of opaque, so I wrote a short
+                    explainer for my future reference:
+                </p>
                 <h3 class="section-subheading">Setting up Caddy</h3>
-                <p>Before starting, make sure your firewall ufw is set to allow connections on http (port 80) and https (port 443).</p>
-                <p>Caddy is not part of the <code>apt</code> repos that are checked when you run apt-get, therefore we first need to add caddy's repo to the system's sources, so when we install it, it knows where to look for it. To do so, we have to start with some setup:</p>
+                <p>Before starting, make sure your firewall ufw is set to allow connections on http (port 80) and https
+                    (port 443).</p>
+                <p>Caddy is not part of the <code>apt</code> repos that are checked when you run apt-get, therefore we
+                    first need to add caddy's repo to the system's sources, so when we install it, it knows where to
+                    look for it. To do so, we have to start with some setup:</p>
                 <p>
-                    <pre><code class="language-shell">$ sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl</code></pre>
+                <pre><code class="language-shell">$ sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl</code></pre>
                 </p>
                 <p>This line installs a few dependencies:</p>
                 <ul>
-                    <li><strong>debian-keyring and debian-archive-keyring:</strong> these update your system's set of cryptographic keys. The point of these is so that, when running apt, they are used to confirm the package being installed is authentic and unmodified (based on the keys).</li>
-                    <li><strong>apt-transport-https:</strong> allows apt to get packages over https, which is included in modern ubuntu systems but it doesn't hurt to check</li>
+                    <li><strong>debian-keyring and debian-archive-keyring:</strong> these update your system's set of
+                        cryptographic keys. The point of these is so that, when running apt, they are used to confirm
+                        the package being installed is authentic and unmodified (based on the keys).</li>
+                    <li><strong>apt-transport-https:</strong> allows apt to get packages over https, which is included
+                        in modern ubuntu systems but it doesn't hurt to check</li>
                     <li><strong>curl:</strong> used to make network requests. Also probably already installed.</li>
                 </ul>
                 <p>After this setup, we run</p>
                 <p>
-                    <pre><code class="language-shell">$ curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg</code></pre>
+                <pre><code class="language-shell">$ curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg</code></pre>
                 </p>
-                <p>This requests for caddy's GPG package key, used to confirm it is authentic. It is done with flags '1'(force https), 's' (silent, the opposite of verbose) , 'L' (follow redirects to reach the key in its current url) and 'f' (fail silently on HTTP errors like 4xx/5xx). The data is piped to the gpg tool, using flag 'dearmor' to convert the key into a binary file with extension .gpg as apt likes it. This gpg file is saved then in the <code>/usr/share/keyrings/</code> path.</p>
+                <p>This requests for caddy's GPG package key, used to confirm it is authentic. It is done with flags
+                    '1'(force https), 's' (silent, the opposite of verbose) , 'L' (follow redirects to reach the key in
+                    its current url) and 'f' (fail silently on HTTP errors like 4xx/5xx). The data is piped to the gpg
+                    tool, using flag 'dearmor' to convert the key into a binary file with extension .gpg as apt likes
+                    it. This gpg file is saved then in the <code>/usr/share/keyrings/</code> path.</p>
                 <p>
-                    <pre><code class="language-shell">$ curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list</code></pre>
+                <pre><code class="language-shell">$ curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list</code></pre>
                 </p>
-                <p>This gets Caddy's APT repository definition text, which contains the urls where your system should get any caddy repo it needs, plus information on which keys to trust. The curl uses the same flags as the last request but now we pipe to tee, which takes the information coming from the request as a text stream and saves it into a .list file as apt likes it.</p>
+                <p>This gets Caddy's APT repository definition text, which contains the urls where your system should
+                    get any caddy repo it needs, plus information on which keys to trust. The curl uses the same flags
+                    as the last request but now we pipe to tee, which takes the information coming from the request as a
+                    text stream and saves it into a .list file as apt likes it.</p>
                 <p>Now we need to set permissions for those files we have created</p>
                 <p>
-                    <pre>
+                <pre>
 <code class="language-shell">$ sudo chmod o+r /usr/share/keyrings/caddy-stable-archive-keyring.gpg
 $ sudo chmod o+r /etc/apt/sources.list.d/caddy-stable.list</code></pre>
                 </p>
-                <p>Chmod is used to set permissions on the files. o+r means 'others' (not the owner of the file) have read permission. This way apt can always access the information in these files</p>
+                <p>Chmod is used to set permissions on the files. o+r means 'others' (not the owner of the file) have
+                    read permission. This way apt can always access the information in these files</p>
                 <p>Now we are ready to install caddy, let's do</p>
                 <p>
-                    <pre><code class="language-shell">$ sudo apt update
+                <pre><code class="language-shell">$ sudo apt update
 $ sudo apt install caddy
 </code></pre>
                 </p>
-                <p>As soon as it's done, caddy will start running. You can see for yourself by requesting your ip on a browser! This will also persist across system reboots.</p>
-                <p>After this, you may follow the instructions that caddy shows on your site. If you do, the server will host files directly from the <code>/var/www/html/</code> path. You can use an ftp client like <strong>cyberduck</strong> to connect through SFTP (make sure you set up ufw to allow connections on port 22) using your same ssh keys and upload files to said path.</p>
+                <p>As soon as it's done, caddy will start running. You can see for yourself by requesting your ip on a
+                    browser! This will also persist across system reboots.</p>
+                <p>After this, you may follow the instructions that caddy shows on your site. If you do, the server will
+                    host files directly from the <code>/var/www/html/</code> path. You can use an ftp client like
+                    <strong>cyberduck</strong> to connect through SFTP (make sure you set up ufw to allow connections on
+                    port 22) using your same ssh keys and upload files to said path.
+                </p>
                 <h3 class="section-subheading">What to do with the server</h3>
-                <p>For now, I routed the subdomain <strong>pipes.nasif.co</strong> to my server on digital ocean and added a sketch I made for the time course: a clock that shows you the solar time on your exact longitude, which is not always aligned to the time in your time zone.</p>
-                <p>As we move forward, I'd like to turn the server into a WebRTC Signaling Server, so I can create projects that communicate with each other peer-to-peer through webrtc. That's why I called it 'pipes'. I believe this sort of communication may be the fastest way to make two client devices talk to each other.</p>
+                <p>For now, I routed the subdomain <strong>pipes.nasif.co</strong> to my server on digital ocean and
+                    added a sketch I made for the time course: a clock that shows you the solar time on your exact
+                    longitude, which is not always aligned to the time in your time zone.</p>
+                <p>As we move forward, I'd like to turn the server into a WebRTC Signaling Server, so I can create
+                    projects that communicate with each other peer-to-peer through webrtc. That's why I called it
+                    'pipes'. I believe this sort of communication may be the fastest way to make two client devices talk
+                    to each other.</p>
             </div>
             <div class="blog-week" id="week-4">
                 <h2 class="project-subtitle"><u>Week 04</u> Readings on 325 Hudson, Colocation Facilities, Fiber Optics

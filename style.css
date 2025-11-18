@@ -399,6 +399,11 @@ a[href]:not([href=""])[download]{
     margin-bottom: 0.5em;
 }
 
+.text-content details {
+    margin-bottom: 1.5em;
+}
+
+
 .text-content figure {
     margin: 40px 0 15px 0;
     width: min-content;
