@@ -27,6 +27,85 @@
             <h1 class="project-title">Understanding Networks</h1>
         </hgroup>
         <div class="text-content">
+            <div class="blog-week" id="week-11">
+                <h2 class="project-subtitle"><u>Week 11</u> Finishing the API</h2>
+                <p>With the skeleton of the API set up, I decided the best use for it was to emulate the use of the <a href="https://en.wikipedia.org/wiki/Trojan_Room_coffee_pot" target="_blank" rel="noopener noreferrer">first ever webcam</a>, which was used to monitor a coffee pot in the University of Cambridge.</p>
+                <p>For an ITP version of this, I decided the camera should monitor the vending machine. Specifically the Coke Zero stock, which is only available on one spot of one machine and consistently runs out.</p>
+                <p> I 3D modeled and printed a small case for the esp32 camera and placed it in front of the vending machine.</p>
+                <div class="image-slide">
+                    <figure>
+                        <img src="https://assets.nasif.co/espcam-case.webp" alt="Black plastic camera connected to a two-prong plug adapter.">
+                        <figcaption>The 3D printed case and power supply.</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="https://assets.nasif.co/espcam-mounted.webp" alt="Small camera mounted on a corner of a wall, with a cable coming out to a nearby wall outlet.">
+                        <figcaption>The mounted camera, right in front of the vending machine. I also added some information about why it was there in case somebody needed to disconnect it.</figcaption>
+                    </figure>
+                </div>
+                <p>The camera gets the following view of the machine:</p>
+                <div class="image-slide">
+                    <figure>
+                        <img src="https://pipes.nasif.co/vending/stock">
+                        <figcaption>This image is pulled directly from the API, it is the latest image taken by the espcam.</figcaption>
+                    </figure>
+                </div>
+                <p>I also fleshed out the API to make more sense, here is the documentation which can also be reached by visiting <a href="http://pipes.nasif.co/vending/docs" target="_blank" rel="noopener noreferrer">http://pipes.nasif.co/vending/docs</a>:</p>
+                <pre><code class="language-txt">
+VENDING MONITOR API DOCUMENTATION
+========================
+
+BASE URL: http://pipes.nasif.co/vending
+
+ENDPOINTS
+---------
+
+1. GET /
+   Check vending monitor camera status and get latest snapshot info
+   
+   Response (Online):
+   {
+     "status": "Online",
+     "snapshot": "https://example.com/vending/stock",
+     "uploadTimeUnix": 1700000000000,
+     "uploadTimeNYC": "11/23/2025, 3:45:00 PM"
+   }
+   
+   Response (Offline):
+   {
+     "status": "Offline",
+     "message": "Camera has not sent an image in over 10 minutes",
+     "lastUpdate": "11/23/2025, 3:30:00 PM",
+     "minutesAgo": 15
+   }
+   
+   Example:
+   curl http://pipes.nasif.co/vending/
+
+
+2. GET /stock
+   Get the full webcam snapshot image
+   
+   Returns: JPEG image
+   
+   Example:
+   curl http://pipes.nasif.co/vending/stock -o snapshot.jpg
+
+
+3. GET /cokezero
+   Get cropped image (35x90px) of Coke Zero stock area
+   
+   Returns: JPEG image
+   
+   Example:
+   curl http://pipes.nasif.co/vending/cokezero -o cropped.jpg</code></pre>
+                <p>As can be seen, the most useful endpoint is the one that shows the current stock of coke zero in the vending machine. As of this writing, we're out :(</p>
+                <div class="image-slide">
+                    <figure>
+                        <img width="200" src="https://pipes.nasif.co/vending/cokezero">
+                        <figcaption>Latest image pulled from the API endpoint /vending/cokezero. Shows the cropped section of where the Coke Zero stock is located in the vending machine.</figcaption>
+                    </figure>
+                </div>
+            </div>
             <div class="blog-week" id="week-10">
                 <h2 class="project-subtitle"><u>Week 10</u> Launching an API</h2>
                 <p>For my API, I decided to keep working with the ESP32CAM. I modified some <a
@@ -388,12 +467,6 @@ app.listen(PORT, () => {
                     <li><strong>/image</strong> (GET): Retrieve the latest image from the camera.</li>
                 </ul>
                 <p>Lastly, I created a reverse proxy using caddy so that the /camera path would lead to the 3005 portwhere my express app was running. With this going, I left the ESP32CAM connected and running, while facing the stack of books on my staging desk for now, until I find a good place to put it that won't intrude in anyone's privacy other than my own.</p>
-                <div class="image-slide">
-                    <figure>
-                        <img src="https://pipes.nasif.co/camera/image">
-                        <figcaption>The latest image captured by the ESP32CAM. This is being served directly from the API. If the image is broken it may indicate the API is down.</figcaption>
-                    </figure>
-                </div>
             </div>
             <div class="blog-week" id="week-8">
                 <h2 class="project-subtitle"><u>Week 08</u> ESP32CAM as an IP Camera</h2>
