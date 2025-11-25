@@ -531,6 +531,7 @@ a[href]:not([href=""])[download]{
 }
 
 .text-content p code,
+.text-content li code,
 .image-slide figcaption code {
     font-family: monospace;
     background-color: #d3d3d354;

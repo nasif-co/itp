@@ -28,7 +28,26 @@
         </hgroup>
         <div class="text-content">
             <div class="blog-week" id="week-11">
-                <h2 class="project-subtitle"><u>Week 11</u> Finishing the API</h2>
+                <h2 class="project-subtitle"><u>Week 11</u> Finishing the API and setting up MQTT client</h2>
+                <h3 class="section-subheading">Setting up an MQTT client</h3>
+                <p>To make a simple shiftr.io mqtt client, I modified the <a href="https://github.com/tigoe/mqtt-examples/blob/main/arduino-clients/MqttClient_SensorTCS34725Sender/MqttClient_SensorTCS34725Sender.ino" target="_blank" rel="noopener noreferrer">first example linked in the class site</a> for use with an ESP32-S3 Feather board. I just needed to do a few changes to get it running:</p>
+                <ul>
+                    <li>Swapped the wifi libraries for <code>WiFi.h</code> for use with ESP32</li>
+                    <li>Changed <code>WiFiSSLClient</code>, which is not a type in this other library, to <code>WiFiClient</code>. This also meant I swapped to an unencripted connection, which I felt was simpler to get things running at first.</li>
+                    <li>Changed port to <code>1883</code> used for unencripted MQTT connections.</li>
+                    <li>Changed the sensor readings for just a random number generator for now.</li>
+                    <li>Used the esp method to get the mac address, otherwise I was only getting zeros.</li>
+                </ul>
+                <p>After some trial and error to get these settings, i got it working.</p>
+                <p>The public shiftr.io broker ui a bit confusing when monitoring what I publish so I installed the <code>mosquitto</code> command line software to subscribe to my topic from the terminal with this command:</p>
+                <pre><code class="language-shell">$ mosquitto_sub -h public.cloud.shiftr.io -p 1883 -t "nrr/feather/#" -u public -P public -v</code></pre>
+                <p>The <code>#</code> at the end listens to any topic that starts with <code>nrr/feather/</code>. This way I could listen to the data being published by the feather board! The output looked like this:</p>
+                <pre><code class="language-shell">
+nasif:~/ $ mosquitto_sub -h public.cloud.shiftr.io -p 1883 -t "nrr/feather/#" -u public -P public -v
+nrr/feather/random 30
+nrr/feather/mac dc5475c108d8
+                </code></pre>
+                <h3 class="section-subheading">Finishing the Vending Monitor API</h3>
                 <p>With the skeleton of the API set up, I decided the best use for it was to emulate the use of the <a href="https://en.wikipedia.org/wiki/Trojan_Room_coffee_pot" target="_blank" rel="noopener noreferrer">first ever webcam</a>, which was used to monitor a coffee pot in the University of Cambridge.</p>
                 <p>For an ITP version of this, I decided the camera should monitor the vending machine. Specifically the Coke Zero stock, which is only available on one spot of one machine and consistently runs out.</p>
                 <p> I 3D modeled and printed a small case for the esp32 camera and placed it in front of the vending machine.</p>
